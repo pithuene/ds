@@ -13,6 +13,11 @@ int main(void) {
   assert(my_vec[1] == 1);
   my_vec[5] = 7;
   assert(my_vec[5] == 7);
+  assert(vecpop(my_vec) == 99);
+  assert(veclen(my_vec) == 99);
+  int urm = vecurm(my_vec, 42);
+  assert(urm == 42);
+  assert(veclen(my_vec) == 98);
   vecfree(my_vec);
   return 0;
 }

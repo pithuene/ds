@@ -3,6 +3,8 @@
 #define vec ds_vec
 #define veclen ds_veclen
 #define vecpush ds_vecpush
+#define vecpop ds_vecpop
+#define vecurm ds_vecurm
 #define vecfree ds_vecfree
 
 typedef struct {
@@ -58,3 +60,6 @@ size_t ds_veclen(void * vec) {
   return ds_vec_header(vec)->len;
 }
 
+#define ds_vecpop(VEC) (VEC[--ds_vec_header(VEC)->len])
+
+#define ds_vecurm(VEC, IDX) (VEC[IDX]); (VEC[IDX] = ds_vecpop(VEC))
