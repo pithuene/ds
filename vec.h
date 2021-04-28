@@ -1,10 +1,15 @@
 #include <stdlib.h>
+#include <string.h>
 
 #define vec ds_vec
 #define veclen ds_veclen
 #define vecpush ds_vecpush
 #define vecpop ds_vecpop
-#define vecurm ds_vecurm
+/* Unordered remove */
+#define vecrmu ds_vecrmu
+/* Ordered remove, use vecrmu if order is irrelevant.
+   This removes the element at idx and moves all following elements back. */
+#define vecrm ds_vecrm
 #define vecfree ds_vecfree
 
 typedef struct {
@@ -62,4 +67,15 @@ size_t ds_veclen(void * vec) {
 
 #define ds_vecpop(VEC) (VEC[--ds_vec_header(VEC)->len])
 
-#define ds_vecurm(VEC, IDX) (VEC[IDX]); (VEC[IDX] = ds_vecpop(VEC))
+#define ds_vecrmu(VEC, IDX) (VEC[IDX]); (VEC[IDX] = ds_vecpop(VEC))
+
+
+#define ds_vecrm(VEC, IDX) (VEC[IDX]); (ds_vecrm_internal(VEC, sizeof(*VEC), IDX))
+
+void ds_vecrm_internal(void * v, size_t stride, size_t idx) {
+    DS_VecHeader * header = ds_vec_header(v);
+    void * dest = (char *) v + stride * idx;
+    void * src = (char *) v + stride * (idx + 1);
+    memmove(dest, src, (header->len - idx - 1) * stride);
+    header->len--;
+}
