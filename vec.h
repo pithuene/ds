@@ -3,6 +3,7 @@
 
 #define vec ds_vec
 #define veclen ds_veclen
+#define veccap ds_veccap
 #define vecpush ds_vecpush
 #define vecpop ds_vecpop
 /* Unordered remove */
@@ -39,20 +40,23 @@ void ds_vecfree(void * vec) {
     ds_vec_grow(VEC, ds_vec_grow_capacity(VEC, COUNT)) \
 )
 
-size_t ds_vec_grow_capacity(void * vec, size_t new_len) {
+/* Calculates the new number of elements after possibly growing to ensure
+ * sufficient capacity for new_elem_count new entries */
+size_t ds_vec_grow_capacity(void * vec, size_t new_elem_count) {
   DS_VecHeader * header = ds_vec_header(vec);
   size_t new_cap = header->cap;
-  while (new_cap < new_len) {
+  while (new_cap < header->len + new_elem_count) {
     new_cap *= 2;
   }
-  return sizeof(DS_VecHeader) + new_cap;
+  return new_cap;
 }
 
-#define ds_vec_grow(VEC, NEWCAP) ((VEC) = ds_vec_grow_internal(VEC, NEWCAP))
+#define ds_vec_grow(VEC, NEWCAP) ((VEC) = ds_vec_grow_internal(VEC, NEWCAP, sizeof(*VEC)))
 
-void * ds_vec_grow_internal(void * vec, size_t new_cap) {
+void * ds_vec_grow_internal(void * vec, size_t new_cap, size_t val_len) {
   DS_VecHeader * header = ds_vec_header(vec);
-  header = (DS_VecHeader *) realloc(header, new_cap);
+  if (header->cap == new_cap) return vec;
+  header = (DS_VecHeader *) realloc(header, sizeof(DS_VecHeader) + new_cap * val_len);
   header->cap = new_cap;
   return (char *) header + sizeof(DS_VecHeader);
 }
@@ -63,6 +67,10 @@ void * ds_vec_grow_internal(void * vec, size_t new_cap) {
 
 size_t ds_veclen(void * vec) {
   return ds_vec_header(vec)->len;
+}
+
+size_t ds_veccap(void * vec) {
+  return ds_vec_header(vec)->cap;
 }
 
 #define ds_vecpop(VEC) (VEC[--ds_vec_header(VEC)->len])
