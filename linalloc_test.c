@@ -1,34 +1,36 @@
 #include "linalloc.h"
 #include "types.h"
 #include <assert.h>
+#include <string.h>
 #include <stdio.h>
 
-typedef struct {
+void test_alloc(void ** lin_allocator) {
+  int * vals[32];
   int i;
-  char * s;
-  char c;
-} Struct;
+  for (i = 0; i < 32; i++) {
+    vals[i] = linalloc(*lin_allocator, sizeof(int));
+    *vals[i] = i*i;
+  }
+  for (i = 0; i < 32; i++) {
+    assert(*vals[i] == i*i);
+  }
+  for (i = 31; i >= 0; i--) {
+    linfree(*lin_allocator, vals[i]);
+  }
+  char * str = linalloc(*lin_allocator, sizeof(char) * 8);
+  strcpy(str, "1234568");
+  assert(strcmp(str, "1234567"));
+}
 
 int main(void) {
-  int i; /* Once for stack and once for heap allocation */
-  for (i = 0; i <= 1; i++) {
-    NewLinAllocator(myalloc, 128, i);
-    Struct * struc = linalloc(myalloc, sizeof(Struct));
-    struc->i = 123451;
-    struc->s = "Hello World";
-    struc->c = 'a';
+  void * buf1 = malloc(128);
+  void * heapAlloc = NewLinAllocator(buf1);
+  test_alloc(&heapAlloc);
+  free(buf1);
 
-    int * integer = linalloc(myalloc, sizeof(int));
-    *integer = 456;
+  char buf2[128];
+  void * stackAlloc = NewLinAllocator(&buf2);
+  test_alloc(&stackAlloc);
 
-    assert(struc->c == 'a');
-    assert(*integer == 456);
-
-    linfree(myalloc, integer);
-    linfree(myalloc, struc);
-
-    /* Only free the buffer if it was heap allocated */
-    if (i == true) FreeLinAllocator(myalloc);
-  }
   return 0;
 }

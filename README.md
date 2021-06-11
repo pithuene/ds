@@ -41,22 +41,23 @@ linalloc
 
 A linear allocator, useful for temporary data with known maximum size.
 Allocates from a single contiguous block of memory.
-Freeing can only occur in reverse order of allocation or for the entire block.
-The block can be stack or heap allocated.
+Freeing can only occur in reverse order of allocation or for the buffer.
 
 ``` c
-/* Create a new linear allocator "myalloc" with a capacity of 128 bytes on the stack */
-NewLinAllocator(myalloc, 128, LinAllocStatic);
+/* Create a new linear allocator "heapAlloc" with a capacity of 128 bytes on the heap */
+void * buf = malloc(128);
+void * heapAlloc = NewLinAllocator(buf);
 
-/* Create a new linear allocator "myalloc" with a capacity of 128 bytes on the heap */
-NewLinAllocator(myalloc, 128, LinAllocDynamic);
+/* Create a new linear allocator "stackAlloc" with a capacity of 128 bytes on the stack */
+char buf[128];
+void * stackAlloc = NewLinAllocator(&buf);
 
-/* Allocate a new instance of "Struct" using the "myalloc" allocator */
-Struct * struc = linalloc(myalloc, sizeof(Struct));
+/* Allocate a new instance of "Struct" using the "heapAlloc" allocator */
+Struct * struc = linalloc(heapAlloc, sizeof(Struct));
 
 /* Free the allocated instance */
 linfree(myalloc, struc);
 
-/* Free an entire dynamic linear allocator */
-FreeLinAllocator(myalloc);
+/* Free an entire buffer used by "heapAlloc" */
+free(buf);
 ```

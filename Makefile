@@ -28,6 +28,6 @@ test_linalloc: linalloc_test
 test_map: map_test
 	valgrind --leak-check=full ./map_test
 
-.PHONY: test
-test: test_vec test_linalloc
+.PHONY: run
+run: test_vec test_linalloc
 
