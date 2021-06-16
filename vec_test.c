@@ -4,7 +4,7 @@
 
 int main(void) {
   /* Initialize */
-  int *my_vec = vec(int, 2);
+  int * my_vec = vec(int, 2);
   assert(veclen(my_vec) == 0);
   assert(veclen(my_vec) == 0);
 
@@ -14,7 +14,6 @@ int main(void) {
       vecpush(my_vec, i);
     }
     assert(veclen(my_vec) == 100);
-    printf("Cap is: %lu\n", veccap(my_vec));
     assert(veccap(my_vec) == 128);
   }
 

@@ -9,7 +9,6 @@ void * NewLinAllocator(void * buff) {
   return buff;
 }
 
-
 /* Allocaltes SIZE bytes from a given linear allocator.
  * Does *not* check whether the underlying buffer has sufficient capacity */
 #define linalloc(ALLOC, SIZE) (ds_linalloc(&ALLOC, SIZE))

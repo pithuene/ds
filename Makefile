@@ -29,5 +29,5 @@ test_map: map_test
 	valgrind --leak-check=full ./map_test
 
 .PHONY: run
-run: test_vec test_linalloc
+run: test_vec test_linalloc test_types
 

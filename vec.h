@@ -77,7 +77,6 @@ size_t ds_veccap(void * vec) {
 
 #define ds_vecrmu(VEC, IDX) (VEC[IDX]); (VEC[IDX] = ds_vecpop(VEC))
 
-
 #define ds_vecrm(VEC, IDX) (VEC[IDX]); (ds_vecrm_internal(VEC, sizeof(*VEC), IDX))
 
 void ds_vecrm_internal(void * v, size_t stride, size_t idx) {
