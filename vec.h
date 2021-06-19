@@ -1,3 +1,6 @@
+#ifndef DS_VEC_H
+#define DS_VEC_H
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -86,3 +89,5 @@ void ds_vecrm_internal(void * v, size_t stride, size_t idx) {
     memmove(dest, src, (header->len - idx - 1) * stride);
     header->len--;
 }
+
+#endif
