@@ -1,8 +1,14 @@
+vec.o: vec.c
+	c89 -c vec.c
+
+libds.a: vec.o
+	ar -rc libds.a vec.o
+
 types_test: types_test.c types.h
 	c89 -o types_test types_test.c
 
-vec_test: vec_test.c vec.h
-	c89 -o vec_test vec_test.c
+vec_test: vec_test.c vec.h libds.a
+	c89 -o vec_test vec_test.c -L. -lds
 
 map_test: map_test.c map.h
 	c89 -o map_test map_test.c

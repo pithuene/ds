@@ -1,10 +1,10 @@
 ds
 ==
 
-A collection of small, simple, header-only C data structures.
+A collection of generic C data structures.
 
-vec.h
------
+vec
+---
 
 A dynamic array. Doubles in size when capacity is exceeded.
 Inspired by [Sean Barrett's stb](https://github.com/nothings/stb), metadata (length and capacity) is stored in front of the pointer, making the vector compatible with static C arrays.
@@ -36,8 +36,8 @@ int el = vecrmu(vector, i);
 vecfree(vector);
 ```
 
-linalloc.h
-----------
+linalloc
+--------
 
 A linear allocator, useful for temporary data with known maximum size.
 Allocates from a single contiguous block of memory.
@@ -62,8 +62,8 @@ linfree(myalloc, struc);
 free(buf);
 ```
 
-types.h
--------
+types
+-----
 
 Defines shorthands for the various integer and float types.
 
