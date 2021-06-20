@@ -2,3 +2,5 @@ vec_test
 linalloc_test
 types_test
 concepts
+*.o
+*.a
