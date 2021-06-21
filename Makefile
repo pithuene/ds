@@ -4,7 +4,7 @@ all: libds.a
 vec.o: vec.c
 	c89 -c vec.c
 
-linalloc.o: linalloc.c
+linalloc.o: linalloc.c libds.a
 	c89 -c linalloc.c -L. -lds
 
 libds.a: vec.o linalloc.o libds.a
@@ -15,6 +15,9 @@ types_test: types_test.c types.h
 
 vec_test: vec_test.c vec.h libds.a
 	c89 -o vec_test vec_test.c -L. -lds
+
+linalloc_test: linalloc_test.c libds.a
+	c89 -o linalloc_test linalloc_test.c -L. -lds
 
 .PHONY: test_types
 test_types: types_test
@@ -33,5 +36,8 @@ run: test_vec test_linalloc test_types
 
 .PHONY: clean
 clean:
+	rm -f ./vec.o; \
 	rm -f ./vec_test; \
-	rm -f ./linalloc_test
+	rm -f ./linalloc.o; \
+	rm -f ./linalloc_test; \
+	rm -f ./libds.a;

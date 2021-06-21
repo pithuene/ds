@@ -29,7 +29,7 @@ int main(void) {
   free(buf1);
 
   char buf2[128];
-  void * stackAlloc = NewLinAllocator(&buf2);
+  void * stackAlloc = NewLinAllocator(buf2);
   test_alloc(&stackAlloc);
 
   return 0;

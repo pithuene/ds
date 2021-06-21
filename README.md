@@ -50,7 +50,7 @@ void * heapAlloc = NewLinAllocator(buf);
 
 /* Create a new linear allocator "stackAlloc" with a capacity of 128 bytes on the stack */
 char buf[128];
-void * stackAlloc = NewLinAllocator(&buf);
+void * stackAlloc = NewLinAllocator(buf);
 
 /* Allocate a new instance of "Struct" using the "heapAlloc" allocator */
 Struct * struc = linalloc(heapAlloc, sizeof(Struct));
