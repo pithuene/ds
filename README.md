@@ -62,6 +62,23 @@ linfree(myalloc, struc);
 free(buf);
 ```
 
+arenaalloc
+----------
+
+An arena allocator, useful for temporary data with unknown maximum size.
+Allocates multiple containers from which are each used as a linear allocator.
+
+``` c
+/* Create a new arena allocator with a container size of 128 bytes */
+ArenaAllocator * arena = NewArenaAllocator(128);
+
+/* Allocate some memory */
+long * l1 = arenaalloc(arena, sizeof(long));
+
+/* Free the entire arena */
+arenafree(arena);
+```
+
 types
 -----
 
