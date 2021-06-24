@@ -3,7 +3,7 @@
 #include <limits.h>
 
 int main(void) {
-  ArenaAllocator * arena = NewArenaAllocator(16);
+  ArenaAllocator * arena = newArenaAllocator(16);
   long * ptr1 = arenaalloc(arena, sizeof(long));
   long * ptr2 = arenaalloc(arena, sizeof(long));
   *ptr2 = 0;

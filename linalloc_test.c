@@ -24,12 +24,12 @@ void test_alloc(void ** lin_allocator) {
 
 int main(void) {
   void * buf1 = malloc(128);
-  void * heapAlloc = NewLinAllocator(buf1);
+  void * heapAlloc = newLinAllocator(buf1);
   test_alloc(&heapAlloc);
   free(buf1);
 
   char buf2[128];
-  void * stackAlloc = NewLinAllocator(buf2);
+  void * stackAlloc = newLinAllocator(buf2);
   test_alloc(&stackAlloc);
 
   return 0;

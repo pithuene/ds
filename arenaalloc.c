@@ -12,7 +12,7 @@ void * arenaAllocFromContainer(void * cont, size_t size) {
   return result;
 }
 
-ArenaAllocator * NewArenaAllocator(size_t container_size) {
+ArenaAllocator * newArenaAllocator(size_t container_size) {
   ArenaAllocator * arena = (ArenaAllocator *) malloc(sizeof(ArenaAllocator));
   arena->container_size = container_size;
   arena->containers = vec(void *, 2);

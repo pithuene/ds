@@ -46,11 +46,11 @@ Freeing can only occur in reverse order of allocation or for the buffer.
 ``` c
 /* Create a new linear allocator "heapAlloc" with a capacity of 128 bytes on the heap */
 void * buf = malloc(128);
-void * heapAlloc = NewLinAllocator(buf);
+void * heapAlloc = newLinAllocator(buf);
 
 /* Create a new linear allocator "stackAlloc" with a capacity of 128 bytes on the stack */
 char buf[128];
-void * stackAlloc = NewLinAllocator(buf);
+void * stackAlloc = newLinAllocator(buf);
 
 /* Allocate a new instance of "Struct" using the "heapAlloc" allocator */
 Struct * struc = linalloc(heapAlloc, sizeof(Struct));
@@ -70,7 +70,7 @@ Allocates multiple containers from which are each used as a linear allocator.
 
 ``` c
 /* Create a new arena allocator with a container size of 128 bytes */
-ArenaAllocator * arena = NewArenaAllocator(128);
+ArenaAllocator * arena = newArenaAllocator(128);
 
 /* Allocate some memory */
 long * l1 = arenaalloc(arena, sizeof(long));

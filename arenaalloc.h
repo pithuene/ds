@@ -17,7 +17,7 @@ typedef struct {
 } ArenaAllocator;
 
 /* Initializes a new arena allocator */
-ArenaAllocator * NewArenaAllocator(size_t container_size);
+ArenaAllocator * newArenaAllocator(size_t container_size);
 
 /* Allocate size bytes from an arena allocator */
 void * arenaalloc(ArenaAllocator * allocator, size_t size);

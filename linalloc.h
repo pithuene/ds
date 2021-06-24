@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 /* Initializes a new linear allocator using a given buffer */
-void * NewLinAllocator(void * buff);
+void * newLinAllocator(void * buff);
 
 /* Allocaltes SIZE bytes from a given linear allocator.
  * Does *not* check whether the underlying buffer has sufficient capacity */

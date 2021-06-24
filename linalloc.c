@@ -1,7 +1,7 @@
 #include "linalloc.h"
 
 /* Initializes a new linear allocator using a given buffer */
-void * NewLinAllocator(void * buff) {
+void * newLinAllocator(void * buff) {
   return buff;
 }
 
