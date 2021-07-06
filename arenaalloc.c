@@ -12,10 +12,10 @@ void * arenaAllocFromContainer(void * cont, size_t size) {
   return result;
 }
 
-ArenaAllocator * newArenaAllocator(size_t container_size) {
-  ArenaAllocator * arena = (ArenaAllocator *) malloc(sizeof(ArenaAllocator));
-  arena->container_size = container_size;
-  arena->containers = vec(void *, 2);
+ArenaAllocator newArenaAllocator(size_t container_size) {
+  ArenaAllocator arena;
+  arena.container_size = container_size;
+  arena.containers = vec(void *, 2);
   return arena;
 }
 
@@ -47,5 +47,4 @@ void arenafree(ArenaAllocator * allocator) {
     munmap((void *) arenaContainerSize(allocator->containers[i]), mappingSize);
   }
   vecfree(allocator->containers);
-  free(allocator);
 }

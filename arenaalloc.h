@@ -2,7 +2,6 @@
 #define DS_ARENAALLOC_H
 
 #include <sys/mman.h>
-#include <stdlib.h>
 #include "vec.h"
 
 /**
@@ -17,7 +16,7 @@ typedef struct {
 } ArenaAllocator;
 
 /* Initializes a new arena allocator */
-ArenaAllocator * newArenaAllocator(size_t container_size);
+ArenaAllocator newArenaAllocator(size_t container_size);
 
 /* Allocate size bytes from an arena allocator */
 void * arenaalloc(ArenaAllocator * allocator, size_t size);

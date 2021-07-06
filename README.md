@@ -70,13 +70,13 @@ Allocates multiple containers from which are each used as a linear allocator.
 
 ``` c
 /* Create a new arena allocator with a container size of 128 bytes */
-ArenaAllocator * arena = newArenaAllocator(128);
+ArenaAllocator arena = newArenaAllocator(128);
 
 /* Allocate some memory */
-long * l1 = arenaalloc(arena, sizeof(long));
+long * l1 = arenaalloc(&arena, sizeof(long));
 
 /* Free the entire arena */
-arenafree(arena);
+arenafree(&arena);
 ```
 
 types
