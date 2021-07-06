@@ -76,7 +76,7 @@ ArenaAllocator arena = newArenaAllocator(128);
 long * l1 = arenaalloc(&arena, sizeof(long));
 
 /* Free the entire arena */
-arenafree(&arena);
+deleteArenaAllocator(&arena);
 ```
 
 types

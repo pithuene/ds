@@ -22,6 +22,6 @@ ArenaAllocator newArenaAllocator(size_t container_size);
 void * arenaalloc(ArenaAllocator * allocator, size_t size);
 
 /* Frees the entire arena */
-void arenafree(ArenaAllocator * allocator);
+void deleteArenaAllocator(ArenaAllocator * allocator);
 
 #endif

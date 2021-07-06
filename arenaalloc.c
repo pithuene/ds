@@ -39,8 +39,7 @@ void * arenaalloc(ArenaAllocator * allocator, size_t size) {
   return arenaAllocFromContainer(allocator->containers[i], size);
 }
 
-
-void arenafree(ArenaAllocator * allocator) {
+void deleteArenaAllocator(ArenaAllocator * allocator) {
   int i;
   for (i = 0; i < veclen(allocator->containers); i++) {
     size_t mappingSize = sizeof(size_t) + allocator->container_size;

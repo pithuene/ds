@@ -13,6 +13,6 @@ int main(void) {
   assert(ptr3 == NULL);
   long * ptr4 = arenaalloc(&arena, 16);
   *ptr4 = 128;
-  arenafree(&arena);
+  deleteArenaAllocator(&arena);
   return 0;
 }
