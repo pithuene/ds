@@ -26,7 +26,13 @@ void * arenaalloc(ArenaAllocator * allocator, size_t size) {
     if (allocator->container_size - *arenaContainerSize(allocator->containers[i]) >= size) break;
   }
   if (i >= veclen(allocator->containers)) {
-    size_t * newContainer = malloc(sizeof(size_t) + allocator->container_size);
+    size_t mappingSize = sizeof(size_t) + allocator->container_size;
+    size_t * newContainer = mmap(
+      NULL,
+      mappingSize,
+      PROT_READ | PROT_WRITE,
+      MAP_PRIVATE | MAP_ANON, 0, 0
+    );
     *newContainer = 0;
     vecpush(allocator->containers, (void *) ((char *) newContainer + sizeof(size_t)));
   }
@@ -37,7 +43,8 @@ void * arenaalloc(ArenaAllocator * allocator, size_t size) {
 void arenafree(ArenaAllocator * allocator) {
   int i;
   for (i = 0; i < veclen(allocator->containers); i++) {
-    free((void *) arenaContainerSize(allocator->containers[i]));
+    size_t mappingSize = sizeof(size_t) + allocator->container_size;
+    munmap((void *) arenaContainerSize(allocator->containers[i]), mappingSize);
   }
   vecfree(allocator->containers);
   free(allocator);

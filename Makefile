@@ -8,7 +8,7 @@ linalloc.o: linalloc.c
 	c89 -c linalloc.c
 
 arenaalloc.o: arenaalloc.c
-	c89 -c arenaalloc.c
+	cc -c arenaalloc.c
 
 libds.a: vec.o linalloc.o arenaalloc.o
 	ar -rc libds.a vec.o linalloc.o arenaalloc.o

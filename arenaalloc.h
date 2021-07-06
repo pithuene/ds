@@ -1,8 +1,8 @@
 #ifndef DS_ARENAALLOC_H
 #define DS_ARENAALLOC_H
 
+#include <sys/mman.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include "vec.h"
 
 /**
