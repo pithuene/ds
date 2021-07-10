@@ -1,55 +1,55 @@
 .PHONY: all
 all: libds.a
 
-vec.o: vec.c
-	c89 -c vec.c
+ds/vec.o: ds/vec.c
+	c89 -c ds/vec.c
 
-linalloc.o: linalloc.c
-	c89 -c linalloc.c
+memory/linalloc.o: memory/linalloc.c
+	c89 -c memory/linalloc.c
 
-arenaalloc.o: arenaalloc.c
-	cc -c arenaalloc.c
+memory/arenaalloc.o: memory/arenaalloc.c
+	cc -c memory/arenaalloc.c
 
-libds.a: vec.o linalloc.o arenaalloc.o
-	ar -rc libds.a vec.o linalloc.o arenaalloc.o
+libds.a: ds/vec.o memory/linalloc.o memory/arenaalloc.o
+	ar -rc libds.a ds/vec.o memory/linalloc.o memory/arenaalloc.o
 
 types_test: types_test.c types.h
 	c89 -o types_test types_test.c
 
-vec_test: vec_test.c vec.h libds.a
-	c89 -o vec_test vec_test.c -L. -lds
+ds/vec_test: ds/vec_test.c ds/vec.h libds.a
+	c89 -o ds/vec_test ds/vec_test.c -L. -lds
 
-linalloc_test: linalloc_test.c libds.a
-	c89 -o linalloc_test linalloc_test.c -L. -lds
+memory/linalloc_test: memory/linalloc_test.c libds.a
+	c89 -o memory/linalloc_test memory/linalloc_test.c -L. -lds
 
-arenaalloc_test: arenaalloc_test.c libds.a
-	c89 -o arenaalloc_test arenaalloc_test.c -L. -lds
+memory/arenaalloc_test: memory/arenaalloc_test.c libds.a
+	c89 -o memory/arenaalloc_test memory/arenaalloc_test.c -L. -lds
 
 .PHONY: test_types
 test_types: types_test
 	valgrind --leak-check=full ./types_test
 
-.PHONY: test_vec
-test_vec: vec_test
-	valgrind --leak-check=full ./vec_test
+.PHONY: ds/test_vec
+ds/test_vec: ds/vec_test
+	valgrind --leak-check=full ./ds/vec_test
 
-.PHONY: test_linalloc
-test_linalloc: linalloc_test
-	valgrind --leak-check=full ./linalloc_test
+.PHONY: memory/test_linalloc
+memory/test_linalloc: memory/linalloc_test
+	valgrind --leak-check=full ./memory/linalloc_test
 
-.PHONY: test_arenaalloc
-test_arenaalloc: arenaalloc_test
-	valgrind --leak-check=full ./arenaalloc_test
+.PHONY: memory/test_arenaalloc
+memory/test_arenaalloc: memory/arenaalloc_test
+	valgrind --leak-check=full ./memory/arenaalloc_test
 
 .PHONY: run
-run: test_vec test_linalloc test_types test_arenaalloc
+run: ds/test_vec memory/test_linalloc test_types memory/test_arenaalloc
 
 .PHONY: clean
 clean:
-	rm -f ./vec.o; \
-	rm -f ./vec_test; \
-	rm -f ./linalloc.o; \
-	rm -f ./linalloc_test; \
-	rm -f ./arenaalloc.o; \
-	rm -f ./arenaalloc_test; \
+	rm -f ./ds/vec.o; \
+	rm -f ./ds/vec_test; \
+	rm -f ./memory/linalloc.o; \
+	rm -f ./memory/linalloc_test; \
+	rm -f ./memory/arenaalloc.o; \
+	rm -f ./memory/arenaalloc_test; \
 	rm -f ./libds.a;

@@ -2,7 +2,7 @@
 #define DS_ARENAALLOC_H
 
 #include <sys/mman.h>
-#include "vec.h"
+#include "../ds/vec.h"
 
 /**
  * Each container is represented by a pointer to its beginning.
