@@ -11,7 +11,7 @@ Inspired by [Sean Barrett's stb](https://github.com/nothings/stb), metadata (len
 
 ``` c
 /* Create an int vector with an initial capacity of 10 */
-int * vector = vec(int, 10);
+vec_t(int) vector = vec(int, 10);
 
 /* Append 42 */
 vecpush(vector, 42);

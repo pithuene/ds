@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define vec_t(TYPE) TYPE *
+
 #define vec ds_vec
 #define veclen ds_veclen
 #define veccap ds_veccap
@@ -22,7 +24,7 @@ typedef struct {
 } DS_VecHeader;
 
 #define ds_vec(TYPE, CAP) \
-    ((TYPE *) ds_vec_new(sizeof(TYPE), CAP))
+    ((vec_t(TYPE)) ds_vec_new(sizeof(TYPE), CAP))
 
 void * ds_vec_new(size_t val_len, size_t cap);
 DS_VecHeader * ds_vec_header(void * v);

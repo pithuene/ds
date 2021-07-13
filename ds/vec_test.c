@@ -4,7 +4,7 @@
 
 int main(void) {
   /* Initialize */
-  int * my_vec = vec(int, 2);
+  vec_t(int) my_vec = vec(int, 2);
   assert(veclen(my_vec) == 0);
   assert(veclen(my_vec) == 0);
 
