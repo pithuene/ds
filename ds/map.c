@@ -1,8 +1,13 @@
 #include "map.h"
 
+/* Calculates the byte length of a bucket for a given val_len */
+size_t ds_map_bucket_len(size_t val_len) {
+  return sizeof(DS_MapBucketHeader) + val_len;
+}
+
 /* Allocates a new empty map for cap values of size val_len */
 void * ds_map_new(size_t val_len, size_t cap) {
-  size_t mem_len = sizeof(DS_MapHeader) + cap * val_len;
+  size_t mem_len = sizeof(DS_MapHeader) + cap * ds_map_bucket_len(val_len);
   DS_MapHeader * ptr = (DS_MapHeader *) malloc(mem_len);
   memset(ptr, 0, mem_len);
   ptr->size = 0;
@@ -25,11 +30,6 @@ size_t ds_map_grow_capacity(void * map, size_t new_elem_count) {
     new_cap *= 2;
   }
   return new_cap;
-}
-
-/* Calculates the byte length of a bucket for a given val_len */
-size_t ds_map_bucket_len(size_t val_len) {
-  return sizeof(DS_MapBucketHeader) + val_len;
 }
 
 /* Returns a pointer to idx-th bucket header */
