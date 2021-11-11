@@ -2,34 +2,34 @@
 all: libds.a
 
 ds/vec.o: ds/vec.c
-	c89 -c -o ds/vec.o ds/vec.c
+	$(CC) -c -o ds/vec.o ds/vec.c
 
 mem/linalloc.o: mem/linalloc.c
-	c89 -c -o mem/linalloc.o mem/linalloc.c
+	$(CC) -c -o mem/linalloc.o mem/linalloc.c
 
 ds/map.o: ds/map.c
-	c89 -c -o ds/map.o ds/map.c
+	$(CC) -c -o ds/map.o ds/map.c
 
 mem/arenaalloc.o: mem/arenaalloc.c
-	cc -c -o mem/arenaalloc.o mem/arenaalloc.c
+	$(CC) -c -o mem/arenaalloc.o mem/arenaalloc.c
 
 libds.a: ds/vec.o ds/map.o mem/linalloc.o mem/arenaalloc.o
 	ar -rc libds.a ds/vec.o ds/map.o mem/linalloc.o mem/arenaalloc.o
 
 types_test: types_test.c types.h
-	c89 -o types_test types_test.c
+	$(CC) -o types_test types_test.c
 
 ds/vec_test: ds/vec_test.c ds/vec.h libds.a
-	c89 -o ds/vec_test ds/vec_test.c -L. -lds
+	$(CC) -o ds/vec_test ds/vec_test.c -L. -lds
 
 mem/linalloc_test: mem/linalloc_test.c libds.a
-	c89 -o mem/linalloc_test mem/linalloc_test.c -L. -lds
+	$(CC) -o mem/linalloc_test mem/linalloc_test.c -L. -lds
 
 ds/map_test: ds/map_test.c ds/map.h libds.a
-	c89 -o ds/map_test ds/map_test.c -L. -lds
+	$(CC) -o ds/map_test ds/map_test.c -L. -lds
 
 mem/arenaalloc_test: mem/arenaalloc_test.c libds.a
-	c89 -o mem/arenaalloc_test mem/arenaalloc_test.c -L. -lds
+	$(CC) -o mem/arenaalloc_test mem/arenaalloc_test.c -L. -lds
 
 .PHONY: test_types
 test_types: types_test
