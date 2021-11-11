@@ -35,7 +35,7 @@ typedef struct {
 DS_MapHeader * ds_map_header(void * v);
 
 /** New Map **/
-#define ds_map(TYPE, CAP) (ds_map_new(sizeof(DS_MapBucket(TYPE)), CAP))
+#define ds_map(TYPE, CAP) (ds_map_new(sizeof(TYPE), CAP))
 
 void * ds_map_new(size_t val_len, size_t cap);
 
