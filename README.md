@@ -36,6 +36,26 @@ int el = vecrmu(vector, i);
 vecfree(vector);
 ```
 
+map
+---
+
+A dynamically growing hash map using linear probing.
+Maps strings to some other type.
+
+``` c
+/* Create an map from string to int with an initial capacity of 4 */
+map_t(int) hashmap = map(int, 4);
+
+/* Put 42 at key "key1" */
+mapput(hashmap, "key1", 42);
+
+/* Get map entry for key "key1" */
+int i = mapget(hashmap, "key1");
+
+/* Free map */
+mapfree(vector);
+```
+
 linalloc
 --------
 
@@ -66,7 +86,7 @@ arenaalloc
 ----------
 
 An arena allocator, useful for temporary data with unknown maximum size.
-Allocates multiple containers from which are each used as a linear allocator.
+Allocates multiple containers which are each used as a linear allocator.
 
 ``` c
 /* Create a new arena allocator with a container size of 128 bytes */
