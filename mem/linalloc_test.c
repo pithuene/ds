@@ -1,5 +1,4 @@
 #include "linalloc.h"
-#include "../types.h"
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>

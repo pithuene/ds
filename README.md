@@ -118,15 +118,3 @@ poolfree(&pool, l1);
 deletePoolAllocator(&pool);
 ```
 
-
-types
------
-
-Defines shorthands for the various integer and float types.
-
-- `u8`, `u16`, `u32`, `u64` for unsigned integers
-- `i8`, `i16`, `i32`, `i64` for signed integers
-- `f32`, `f64`, `f128` for floats
-
-Also includes the `stdbool.h` header to make `bool`, `true` and `false` available.
-
