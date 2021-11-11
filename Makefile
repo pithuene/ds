@@ -13,8 +13,11 @@ ds/map.o: ds/map.c
 mem/arenaalloc.o: mem/arenaalloc.c
 	$(CC) -c -o mem/arenaalloc.o mem/arenaalloc.c
 
-libds.a: ds/vec.o ds/map.o mem/linalloc.o mem/arenaalloc.o
-	ar -rc libds.a ds/vec.o ds/map.o mem/linalloc.o mem/arenaalloc.o
+mem/poolalloc.o: mem/poolalloc.c
+	$(CC) -c -o mem/poolalloc.o mem/poolalloc.c
+
+libds.a: ds/vec.o ds/map.o mem/linalloc.o mem/arenaalloc.o mem/poolalloc.o
+	ar -rc libds.a ds/vec.o ds/map.o mem/linalloc.o mem/arenaalloc.o mem/poolalloc.o
 
 types_test: types_test.c types.h
 	$(CC) -o types_test types_test.c
@@ -30,6 +33,9 @@ ds/map_test: ds/map_test.c ds/map.h libds.a
 
 mem/arenaalloc_test: mem/arenaalloc_test.c libds.a
 	$(CC) -o mem/arenaalloc_test mem/arenaalloc_test.c -L. -lds
+
+mem/poolalloc_test: mem/poolalloc_test.c libds.a
+	$(CC) -o mem/poolalloc_test mem/poolalloc_test.c -L. -lds
 
 .PHONY: test_types
 test_types: types_test
@@ -51,8 +57,12 @@ test_map: ds/map_test
 test_arenaalloc: mem/arenaalloc_test
 	valgrind --leak-check=full ./mem/arenaalloc_test
 
+.PHONY: test_poolalloc
+test_poolalloc: mem/poolalloc_test
+	valgrind --leak-check=full ./mem/poolalloc_test
+
 .PHONY: run
-run: test_vec test_map test_linalloc test_types test_arenaalloc
+run: test_vec test_map test_linalloc test_types test_arenaalloc test_poolalloc
 
 .PHONY: clean
 clean:
@@ -64,4 +74,6 @@ clean:
 	rm -f ./mem/linalloc_test; \
 	rm -f ./mem/arenaalloc.o; \
 	rm -f ./mem/arenaalloc_test; \
+	rm -f ./mem/poolalloc.o; \
+	rm -f ./mem/poolalloc_test; \
 	rm -f ./libds.a;

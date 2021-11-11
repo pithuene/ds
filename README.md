@@ -99,6 +99,26 @@ long * l1 = arenaalloc(&arena, sizeof(long));
 deleteArenaAllocator(&arena);
 ```
 
+poolalloc
+---------
+
+A pool allocator, useful for quickly allocating and freeing fixed size blocks.
+
+``` c
+/* Create a new pool allocator */
+PoolAllocator pool = newPoolAllocator(sizeof(long));
+
+/* Allocate some memory */
+long * l1 = poolalloc(&pool);
+
+/* Free a block */
+poolfree(&pool, l1);
+
+/* Free the entire pool */
+deletePoolAllocator(&pool);
+```
+
+
 types
 -----
 
