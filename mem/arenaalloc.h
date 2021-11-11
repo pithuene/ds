@@ -12,7 +12,7 @@
 
 typedef struct {
   size_t container_size;
-  void ** containers;
+  vec_t(void *) containers;
 } ArenaAllocator;
 
 /* Initializes a new arena allocator */
