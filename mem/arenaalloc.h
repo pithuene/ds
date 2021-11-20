@@ -13,15 +13,15 @@
 typedef struct {
   size_t container_size;
   vec_t(void *) containers;
-} ArenaAllocator;
+} arena_allocator_t;
 
 /* Initializes a new arena allocator */
-ArenaAllocator newArenaAllocator(size_t container_size);
+arena_allocator_t new_arena_allocator(size_t container_size);
 
 /* Allocate size bytes from an arena allocator */
-void * arenaalloc(ArenaAllocator * allocator, size_t size);
+void * arenaalloc(arena_allocator_t * allocator, size_t size);
 
 /* Frees the entire arena */
-void deleteArenaAllocator(ArenaAllocator * allocator);
+void free_arena_allocator(arena_allocator_t * allocator);
 
 #endif

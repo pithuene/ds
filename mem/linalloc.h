@@ -4,21 +4,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+typedef void * linear_allocator_t;
+
 /* Initializes a new linear allocator using a given buffer */
-void * newLinAllocator(void * buff);
+linear_allocator_t new_linear_allocator(void * buffer);
 
 /* Allocaltes SIZE bytes from a given linear allocator.
  * Does *not* check whether the underlying buffer has sufficient capacity */
-#define linalloc(ALLOC, SIZE) (ds_linalloc(&ALLOC, SIZE))
-
-void * ds_linalloc(void ** allocator, size_t size);
+void * linalloc(linear_allocator_t * allocator, size_t size);
 /**
  * Freeing a pointer also frees all allocations made afterwards.
  * Usually, you only want to free the last allocation.
  * You don't need to free the individual allocations as long as the buffer is
  * freed.
  */
-#define linfree(ALLOC, PTR) (ds_linfree(&ALLOC, PTR))
+void linfree(linear_allocator_t * allocator, void * ptr);
 
-void ds_linfree(void ** allocator, void * ptr);
 #endif

@@ -1,6 +1,6 @@
 #include "poolalloc.h"
 
-PoolAllocator newPoolAllocator(size_t block_size) {
+pool_allocator_t new_pool_allocator(size_t block_size) {
   // Make sure a block can hold a free-list pointer
   if (block_size < sizeof(size_t)) {
     block_size = sizeof(size_t);
@@ -14,16 +14,16 @@ PoolAllocator newPoolAllocator(size_t block_size) {
     page_size *= pages_per_block;
   }
 
-  PoolAllocator pool_allocator;
+  pool_allocator_t pool_allocator;
   pool_allocator.block_size = block_size;
-  ArenaAllocator arena = newArenaAllocator(page_size);
+  arena_allocator_t arena = new_arena_allocator(page_size);
   pool_allocator.arena = arena;
   pool_allocator.free_list_head = NULL;
 
   return pool_allocator;
 }
 
-void * poolalloc(PoolAllocator * pool_allocator) {
+void * poolalloc(pool_allocator_t * pool_allocator) {
   if (pool_allocator->free_list_head != NULL) {
     void * block = pool_allocator->free_list_head;
     // Remove from free-list
@@ -37,11 +37,11 @@ void * poolalloc(PoolAllocator * pool_allocator) {
 }
 
 
-void poolfree(PoolAllocator * allocator, void * block) {
+void poolfree(pool_allocator_t * allocator, void * block) {
   *((void **) block) = allocator->free_list_head;
   allocator->free_list_head = block;
 }
 
-void deletePoolAllocator(PoolAllocator * allocator) {
-  deleteArenaAllocator(&allocator->arena);
+void delete_pool_allocator(pool_allocator_t * allocator) {
+  free_arena_allocator(&allocator->arena);
 }

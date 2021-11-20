@@ -3,7 +3,7 @@
 #include <limits.h>
 
 int main(void) {
-  ArenaAllocator arena = newArenaAllocator(16);
+  arena_allocator_t arena = new_arena_allocator(16);
   long * ptr1 = arenaalloc(&arena, sizeof(long));
   long * ptr2 = arenaalloc(&arena, sizeof(long));
   *ptr2 = 0;
@@ -13,6 +13,6 @@ int main(void) {
   assert(ptr3 == NULL);
   long * ptr4 = arenaalloc(&arena, 16);
   *ptr4 = 128;
-  deleteArenaAllocator(&arena);
+  free_arena_allocator(&arena);
   return 0;
 }

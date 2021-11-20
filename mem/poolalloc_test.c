@@ -9,7 +9,7 @@ typedef struct {
 } Struct;
 
 int main(void) {
-  PoolAllocator pool = newPoolAllocator(sizeof(Struct));
+  pool_allocator_t pool = new_pool_allocator(sizeof(Struct));
 
   int num = 10000;
 
@@ -27,6 +27,6 @@ int main(void) {
     poolfree(&pool, strcts[i]);
   }
 
-  deletePoolAllocator(&pool);
+  delete_pool_allocator(&pool);
   return 0;
 }

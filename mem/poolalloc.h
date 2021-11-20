@@ -12,19 +12,19 @@
 typedef struct {
   size_t block_size;
   void * free_list_head;
-  ArenaAllocator arena;
-} PoolAllocator;
+  arena_allocator_t arena;
+} pool_allocator_t;
 
 /* Initializes a new pool allocator */
-PoolAllocator newPoolAllocator(size_t block_size);
+pool_allocator_t new_pool_allocator(size_t block_size);
 
 /* Allocate a new block from the pool*/
-void * poolalloc(PoolAllocator * allocator);
+void * poolalloc(pool_allocator_t * allocator);
 
 /* Free a block */
-void poolfree(PoolAllocator * allocator, void * block);
+void poolfree(pool_allocator_t * allocator, void * block);
 
 /* Frees the entire pool allocator */
-void deletePoolAllocator(PoolAllocator * allocator);
+void delete_pool_allocator(pool_allocator_t * allocator);
 
 #endif

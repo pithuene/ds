@@ -11,7 +11,7 @@ typedef struct {
 int main(void) {
   map_t(Struct) my_map = map(Struct, 4);
 
-  ArenaAllocator arena = newArenaAllocator(1024);
+  arena_allocator_t arena = new_arena_allocator(1024);
 
   /* Put */ {
     int i;
@@ -35,7 +35,7 @@ int main(void) {
   }
 
   mapfree(my_map);
-  deleteArenaAllocator(&arena);
+  free_arena_allocator(&arena);
   return 0;
 }
 
