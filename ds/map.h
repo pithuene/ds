@@ -10,6 +10,7 @@
 #define mapput ds_mapput
 #define mapget ds_mapget
 #define mapfree ds_mapfree
+#define mapforeach ds_mapforeach
 
 typedef struct {
   char * key;
@@ -65,5 +66,21 @@ int ds_map_get_key_idx(void * map, char * key, size_t val_len);
 
 /** Free Map **/
 void ds_mapfree(void * map);
+
+/** Foreach **/
+/* TODO: Would it be more efficient to move the key and value declarations to the outside of the loop? */
+/* TODO: It might make sense to offer a mutable version too (value needs to be set using mapput currently)*/
+
+/* Iterate over each entry of MAP.
+ * 
+ * map_t(int) intmap = map(int, 4);
+ * ...
+ * mapforeach(char * key, int value, intmap) { ... }
+ */
+#define ds_mapforeach(KEY_DECL, VAL_DECL, MAP) \
+  for (int ds_map_foreach_i = 0; ds_map_foreach_i < ds_map_header(MAP)->cap; ds_map_foreach_i++) /* Iterate over all buckets, full or not */ \
+  for (DS_MapBucketHeader *header = &MAP[ds_map_foreach_i].header, *_=(void*)1; header->full && _; _=(void*)0) /* Do this only if the bucket is full, but once per bucket at most */ \
+  for (KEY_DECL = header->key, *_=(void*)1; _; _=(void*)0) /* Declare key */\
+  for (VAL_DECL = MAP[ds_map_foreach_i].value, *_=(void*)1; _; _=(void*)0) /* Declare value */
 
 #endif

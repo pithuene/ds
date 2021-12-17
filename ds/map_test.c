@@ -34,6 +34,14 @@ int main(void) {
     assert(s456.number == 456);
   }
 
+  /* Foreach */ {
+    char * str = arenaalloc(&arena, 8);
+    mapforeach(char * key, Struct val, my_map) {
+      sprintf(str, "key%d", val.number);
+      assert(strcmp(key, str) == 0);
+    }
+  }
+
   mapfree(my_map);
   free_arena_allocator(&arena);
   return 0;
