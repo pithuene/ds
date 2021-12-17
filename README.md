@@ -52,6 +52,11 @@ mapput(hashmap, "key1", 42);
 /* Get map entry for key "key1" */
 int i = mapget(hashmap, "key1");
 
+/* Loop over all map entries */
+mapforeach(char * key, int value, hashmap) {
+  /* This is called for each key-value pair */
+}
+
 /* Free map */
 mapfree(vector);
 ```
@@ -66,17 +71,17 @@ Freeing can only occur in reverse order of allocation or for the buffer.
 ``` c
 /* Create a new linear allocator "heapAlloc" with a capacity of 128 bytes on the heap */
 void * buf = malloc(128);
-void * heapAlloc = newLinAllocator(buf);
+linear_allocator_t heapAlloc = new_linear_allocator(buf);
 
 /* Create a new linear allocator "stackAlloc" with a capacity of 128 bytes on the stack */
 char buf[128];
-void * stackAlloc = newLinAllocator(buf);
+linear_allocator_t stackAlloc = new_linear_allocator(buf);
 
 /* Allocate a new instance of "Struct" using the "heapAlloc" allocator */
-Struct * struc = linalloc(heapAlloc, sizeof(Struct));
+Struct * struc = linalloc(&heapAlloc, sizeof(Struct));
 
 /* Free the allocated instance */
-linfree(myalloc, struc);
+linfree(&heapAlloc, struc);
 
 /* Free an entire buffer used by "heapAlloc" */
 free(buf);
@@ -90,13 +95,13 @@ Allocates multiple containers which are each used as a linear allocator.
 
 ``` c
 /* Create a new arena allocator with a container size of 128 bytes */
-ArenaAllocator arena = newArenaAllocator(128);
+arena_allocator_t arena = new_arena_allocator(128);
 
 /* Allocate some memory */
 long * l1 = arenaalloc(&arena, sizeof(long));
 
 /* Free the entire arena */
-deleteArenaAllocator(&arena);
+free_arena_allocator(&arena);
 ```
 
 poolalloc
@@ -106,7 +111,7 @@ A pool allocator, useful for quickly allocating and freeing fixed size blocks.
 
 ``` c
 /* Create a new pool allocator */
-PoolAllocator pool = newPoolAllocator(sizeof(long));
+pool_allocator_t pool = new_pool_allocator(sizeof(long));
 
 /* Allocate some memory */
 long * l1 = poolalloc(&pool);
@@ -115,6 +120,6 @@ long * l1 = poolalloc(&pool);
 poolfree(&pool, l1);
 
 /* Free the entire pool */
-deletePoolAllocator(&pool);
+free_pool_allocator(&pool);
 ```
 
