@@ -25,6 +25,6 @@ void * poolalloc(pool_allocator_t * allocator);
 void poolfree(pool_allocator_t * allocator, void * block);
 
 /* Frees the entire pool allocator */
-void delete_pool_allocator(pool_allocator_t * allocator);
+void free_pool_allocator(pool_allocator_t * allocator);
 
 #endif

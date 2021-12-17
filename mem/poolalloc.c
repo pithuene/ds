@@ -42,6 +42,6 @@ void poolfree(pool_allocator_t * allocator, void * block) {
   allocator->free_list_head = block;
 }
 
-void delete_pool_allocator(pool_allocator_t * allocator) {
+void free_pool_allocator(pool_allocator_t * allocator) {
   free_arena_allocator(&allocator->arena);
 }

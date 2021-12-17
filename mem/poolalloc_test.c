@@ -27,6 +27,6 @@ int main(void) {
     poolfree(&pool, strcts[i]);
   }
 
-  delete_pool_allocator(&pool);
+  free_pool_allocator(&pool);
   return 0;
 }
