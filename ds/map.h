@@ -14,8 +14,8 @@
 
 typedef struct {
   char * key;
-  char full : 1;
-  char tombstone : 1;
+  unsigned char full : 1;
+  unsigned char tombstone : 1;
 } DS_MapBucketHeader;
 
 #define DS_MapBucket(TYPE) struct { \

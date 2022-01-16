@@ -34,7 +34,6 @@ size_t ds_map_grow_capacity(void * map, size_t new_elem_count) {
 
 /* Returns a pointer to idx-th bucket header */
 DS_MapBucketHeader * ds_map_bucket_header(void * map, int idx, size_t val_len) {
-  DS_MapHeader * header = ds_map_header(map);
   size_t bucket_len = ds_map_bucket_len(val_len);
   return (DS_MapBucketHeader *) ((char *) map + idx * bucket_len);
 }
@@ -48,7 +47,7 @@ size_t ds_map_mem_len(size_t cap, size_t val_len) {
 unsigned long ds_strhash(unsigned char *str) {
   unsigned long hash = 5381;
   int c;
-  while (c = *str++)
+  while ((c = *str++))
     hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
   return hash;
 }
@@ -67,7 +66,8 @@ int ds_map_get_key_idx(void * map, char * key, size_t val_len) {
     return bucketIndex;
   } else { /* Key not in map */
     /* TODO: How should this be handled?
-     * TODO: I can't just return null through the array index */
+     * TODO: I can't just return null through the array index 
+     * TODO: Why don't I put an extra bucket at -1, zero out its memory, and return that. There shout be a way to check if a key is in the map, so the user can catch this, and maybe a way to set the default value (which will write into this -1 bucket). In case of a pointer type this will actually be a null pointer and in other cases it's the most reasonable default value there is.*/
     return -100000000; /* Should crash with SIGSEGV */
   }
 }

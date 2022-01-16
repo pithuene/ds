@@ -1,3 +1,4 @@
+#define _DEFAULT_SOURCE
 #include "arenaalloc.h"
 
 /* The number of bytes already allocated from a container */
@@ -21,7 +22,7 @@ arena_allocator_t new_arena_allocator(size_t container_size) {
 
 void * arenaalloc(arena_allocator_t * allocator, size_t size) {
   if (size > allocator->container_size) return NULL;
-  int i;
+  size_t i;
   for (i = 0; i < veclen(allocator->containers); i++) {
     if (allocator->container_size - *arenaContainerSize(allocator->containers[i]) >= size) break;
   }
@@ -31,7 +32,7 @@ void * arenaalloc(arena_allocator_t * allocator, size_t size) {
       NULL,
       mappingSize,
       PROT_READ | PROT_WRITE,
-      MAP_PRIVATE | MAP_ANON, 0, 0
+      MAP_PRIVATE | MAP_ANONYMOUS, 0, 0
     );
     *newContainer = 0;
     vecpush(allocator->containers, (void *) ((char *) newContainer + sizeof(size_t)));
@@ -40,7 +41,7 @@ void * arenaalloc(arena_allocator_t * allocator, size_t size) {
 }
 
 void free_arena_allocator(arena_allocator_t * allocator) {
-  int i;
+  size_t i;
   for (i = 0; i < veclen(allocator->containers); i++) {
     size_t mappingSize = sizeof(size_t) + allocator->container_size;
     munmap((void *) arenaContainerSize(allocator->containers[i]), mappingSize);

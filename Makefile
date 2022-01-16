@@ -1,23 +1,25 @@
+CFLAGS = -std=c99 -Wall -Wextra -Werror -pedantic
+
 .PHONY: all
 all: libds.a
 
 ds/vec.o: ds/vec.c
-	$(CC) -c -o ds/vec.o ds/vec.c
+	$(CC) $(CFLAGS) -c -o ds/vec.o ds/vec.c
 
 mem/linalloc.o: mem/linalloc.c
-	$(CC) -c -o mem/linalloc.o mem/linalloc.c
+	$(CC) $(CFLAGS) -c -o mem/linalloc.o mem/linalloc.c
 
 ds/map.o: ds/map.c
-	$(CC) -c -o ds/map.o ds/map.c
+	$(CC) $(CFLAGS) -c -o ds/map.o ds/map.c
 
 ds/llist.o: ds/llist.c
-	$(CC) -c -g -o ds/llist.o ds/llist.c
+	$(CC) $(CFLAGS) -c -g -o ds/llist.o ds/llist.c
 
 mem/arenaalloc.o: mem/arenaalloc.c
-	$(CC) -c -o mem/arenaalloc.o mem/arenaalloc.c
+	$(CC) $(CFLAGS) -c -o mem/arenaalloc.o mem/arenaalloc.c
 
 mem/poolalloc.o: mem/poolalloc.c
-	$(CC) -c -o mem/poolalloc.o mem/poolalloc.c
+	$(CC) $(CFLAGS) -c -o mem/poolalloc.o mem/poolalloc.c
 
 libds.a: ds/vec.o ds/map.o ds/llist.o mem/linalloc.o mem/arenaalloc.o mem/poolalloc.o
 	ar -rc libds.a ds/vec.o ds/map.o ds/llist.o mem/linalloc.o mem/arenaalloc.o mem/poolalloc.o
@@ -65,8 +67,7 @@ test_poolalloc: mem/poolalloc_test
 	valgrind --leak-check=full ./mem/poolalloc_test
 
 .PHONY: run
-run: test_llist
-#run: test_vec test_map test_llist test_linalloc test_arenaalloc test_poolalloc
+run: test_vec test_map test_llist test_linalloc test_arenaalloc test_poolalloc
 
 .PHONY: clean
 clean:

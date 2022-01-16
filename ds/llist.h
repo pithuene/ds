@@ -86,11 +86,6 @@ void ds_llist_add_memblock(void * l, size_t entry_len);
       header->length++; \
     }
   
-
-
-// TODO: Doesn't set the next pointer of the previous value yet
-
-
 /** Free list **/
 void ds_llistfree(void * l);
 

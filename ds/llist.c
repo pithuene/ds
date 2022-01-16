@@ -34,7 +34,7 @@ void ds_llist_add_memblock(void * l, size_t entry_len) {
   // Add all items in the memblock to the free list
   DS_LList_Item_Ptr next = header->free_list;
   DS_LList_Item_Ptr * entry = NULL;
-  for (int64_t offset = 0; offset < header->memblock_size / entry_len; offset++) {
+  for (uint64_t offset = 0; offset < header->memblock_size / entry_len; offset++) {
     entry = (DS_LList_Item_Ptr *) ((char *) memblock + entry_len * offset);
     *entry = next;
     next.null = 0;
@@ -89,7 +89,7 @@ void * ds_llist_new(size_t val_len, size_t block_size) {
 void ds_llistfree(void * l) {
   vec_t(void *) * list = l;
   DS_LListHeader * header = ds_llist_header(l);
-  for (int i = 0; i < veclen(*list); i++) {
+  for (size_t i = 0; i < veclen(*list); i++) {
     free((*list)[i]);
   }
   vecfree(*list);

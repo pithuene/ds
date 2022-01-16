@@ -1,3 +1,4 @@
+#define _DEFAULT_SOURCE
 #include "poolalloc.h"
 
 pool_allocator_t new_pool_allocator(size_t block_size) {
@@ -6,8 +7,7 @@ pool_allocator_t new_pool_allocator(size_t block_size) {
     block_size = sizeof(size_t);
   }
 
-
-  int page_size = getpagesize();
+  size_t page_size = getpagesize();
   // Make sure a block fits inside a pool
   if (block_size > page_size) {
     int pages_per_block = (block_size / page_size) + 1;
