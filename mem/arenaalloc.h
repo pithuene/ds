@@ -24,4 +24,8 @@ void * arenaalloc(arena_allocator_t * allocator, size_t size);
 /* Frees the entire arena */
 void free_arena_allocator(arena_allocator_t * allocator);
 
+/* Clear all the data but keep the internal structure.
+ * More efficient than freeing and creating a new allocator */
+void arena_allocator_reset(arena_allocator_t * allocator);
+
 #endif
