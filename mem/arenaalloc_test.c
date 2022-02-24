@@ -13,6 +13,10 @@ int main(void) {
   assert(ptr3 == NULL);
   long * ptr4 = arenaalloc(&arena, 16);
   *ptr4 = 128;
+
+  arena_allocator_reset(&arena);
+  assert(veclen(arena.containers) == 0);
+
   free_arena_allocator(&arena);
   return 0;
 }

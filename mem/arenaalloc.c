@@ -49,11 +49,12 @@ void free_arena_allocator(arena_allocator_t * allocator) {
 }
 
 void arena_allocator_reset(arena_allocator_t * allocator) {
-  for (int i = 0; i < veclen(allocator->containers); i++) {
+  size_t number_of_blocks = veclen(allocator->containers);
+  for (int i = 0; i < number_of_blocks; i++) {
     size_t mappingSize = sizeof(size_t) + allocator->container_size;
     munmap((void *) arenaContainerSize(allocator->containers[i]), mappingSize);
   }
-  for (int i = 0; i < veclen(allocator->containers); i++) {
-    void * removed = vecrmu(allocator->containers, 0);
+  for (int i = 0; i < number_of_blocks; i++) {
+    void * removed = vecpop(allocator->containers);
   }
 }
