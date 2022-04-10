@@ -24,6 +24,9 @@ mem/poolalloc.o: mem/poolalloc.c
 libds.a: ds/vec.o ds/map.o ds/llist.o mem/linalloc.o mem/arenaalloc.o mem/poolalloc.o
 	ar -rc libds.a ds/vec.o ds/map.o ds/llist.o mem/linalloc.o mem/arenaalloc.o mem/poolalloc.o
 
+ds/arr_test: ds/arr_test.c ds/arr.h libds.a
+	$(CC) -o ds/arr_test ds/arr_test.c -L. -lds
+
 ds/vec_test: ds/vec_test.c ds/vec.h libds.a
 	$(CC) -o ds/vec_test ds/vec_test.c -L. -lds
 
@@ -41,6 +44,10 @@ mem/arenaalloc_test: mem/arenaalloc_test.c libds.a
 
 mem/poolalloc_test: mem/poolalloc_test.c libds.a
 	$(CC) -o mem/poolalloc_test mem/poolalloc_test.c -L. -lds
+
+.PHONY: test_arr
+test_arr: ds/arr_test
+	valgrind --leak-check=full ./ds/arr_test
 
 .PHONY: test_vec
 test_vec: ds/vec_test
@@ -67,7 +74,7 @@ test_poolalloc: mem/poolalloc_test
 	valgrind --leak-check=full ./mem/poolalloc_test
 
 .PHONY: run
-run: test_vec test_map test_llist test_linalloc test_arenaalloc test_poolalloc
+run: test_arr test_vec test_map test_llist test_linalloc test_arenaalloc test_poolalloc
 
 .PHONY: clean
 clean:
