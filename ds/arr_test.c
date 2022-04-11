@@ -27,5 +27,11 @@ int main(void) {
     assert(array2[i] == 2*i);
   }
 
+  /* arr_get and arr_set */ {
+    assert(arr_get(array1, 1) == 2);
+    arr_set(array1, 1, 123);
+    assert(arr_get(array1, 1) == 123);
+  }
+
   return 0;
 }
