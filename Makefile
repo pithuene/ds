@@ -1,7 +1,7 @@
 CFLAGS_DEBUG = -g -fprofile-arcs -ftest-coverage
 CFLAGS = -std=c99 -pedantic -Wall -Wno-override-init-side-effects -Wno-unused-function -Werror $(CFLAGS_DEBUG)
 
-TEST_SRCS = test/test_arr.c
+TEST_SRCS = test/test_arr.c test/test_vec.c
 
 vec/vec.o: vec/vec.c
 	$(CC) $(CFLAGS) -c -o vec/vec.o vec/vec.c
@@ -24,7 +24,7 @@ test: test/test
 
 .PHONY: coverage
 coverage: test
-	gcovr -s --html-details ./coverage/coverage.html --exclude test/test.c --exclude test/munit/munit.c --exclude test/test_arr.c test/test_vec.c
+	gcovr -s --html-details ./coverage/coverage.html --exclude test/test.c --exclude test/munit/munit.c --exclude test/test_arr.c --exclude test/test_vec.c
 	xdg-open ./coverage/coverage.html
 
 .PHONY: clean
