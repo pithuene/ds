@@ -16,8 +16,6 @@
   #define vec_free    ds_vec_free
 #endif /* DS_NO_SHORT_NAMES */
 
-#define ds_vec_t(TYPE) TYPE *
-
 /* INTERNAL */
 
 typedef struct {
@@ -30,6 +28,7 @@ __ds_vec_header_t *__ds_vec_header(void *vec);
 
 /* EXTERNAL */
 
+#define ds_vec_t(TYPE) TYPE *
 // Allocate a new vector with a given initial capacity
 #define ds_vec_create(TYPE, CAP) \
   ((ds_vec_t(TYPE)) __ds_vec_create(sizeof(TYPE), CAP))

@@ -1,0 +1,45 @@
+#ifndef DS_POOL_H
+#define DS_POOL_H
+
+#include <stdint.h>
+#include <stddef.h>
+
+// The number of bits of a 32bit pool_cell_ref which identify a cell in a given pool.
+// Every block contains 2^DS_POOL_CELL_BITS items.
+#define DS_POOL_CELL_BITS 7
+// The remaining number of bits in the pool_cell_ref.
+// There can be up to 2^DS_POOL_BLOCK_BITS blocks.
+#define DS_POOL_BLOCK_BITS 25
+
+#ifndef DS_NO_SHORT_NAMES
+  #define pool_allocator_t ds_pool_allocator_t
+#endif /* DS_NO_SHORT_NAMES */
+
+/* INTERNAL */
+
+typedef struct {
+  uint32_t block_idx : DS_POOL_BLOCK_BITS;
+  uint32_t cell_idx  : DS_POOL_CELL_BITS;
+} __ds_pool_cell_ref_t;
+
+// The pool header essentially contains a cell ref,
+// but is separate because it needs to have 8byte alignment
+// to make sure no padding is inserted between the header
+// and the first value.
+typedef struct {
+  uint64_t block_idx        : DS_POOL_BLOCK_BITS;
+  uint64_t cell_idx         : DS_POOL_CELL_BITS;
+  uint64_t number_of_blocks : 32;
+} __ds_pool_header_t;
+
+void **__ds_new_pool_allocator(size_t val_len);
+
+/* EXTERNAL */
+
+#define ds_pool_allocator_t(TYPE) TYPE **
+
+#define ds_new_pool_allocator(TYPE) \
+  ((TYPE **) __ds_new_pool_allocator(sizeof(TYPE)))
+
+
+#endif
