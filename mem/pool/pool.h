@@ -11,6 +11,10 @@
 // There can be up to 2^DS_POOL_BLOCK_BITS blocks.
 #define DS_POOL_BLOCK_BITS 25
 
+// The number of bits used to express the power of the block capacity.
+// The maximum expressable block capacity is therefore (2^DS_POOL_BLOCK_CAP_POW_BITS) - 1.
+#define DS_POOL_BLOCK_CAP_POW_BITS 3
+
 #ifndef DS_NO_SHORT_NAMES
   #define pool_allocator_t ds_pool_allocator_t
 #endif /* DS_NO_SHORT_NAMES */
@@ -27,9 +31,12 @@ typedef struct {
 // to make sure no padding is inserted between the header
 // and the first value.
 typedef struct {
-  uint64_t block_idx        : DS_POOL_BLOCK_BITS;
-  uint64_t cell_idx         : DS_POOL_CELL_BITS;
-  uint64_t number_of_blocks : 32;
+  uint64_t block_idx           : DS_POOL_BLOCK_BITS;
+  uint64_t cell_idx            : DS_POOL_CELL_BITS;
+  uint64_t number_of_blocks    : DS_POOL_BLOCK_BITS;
+  // Block capacity is always a power of two.
+  // The next block will have 2^next_block_capacity_power cells.
+  uint64_t next_block_capacity_power : DS_POOL_BLOCK_CAP_POW_BITS;
 } __ds_pool_header_t;
 
 void **__ds_new_pool_allocator(size_t val_len);

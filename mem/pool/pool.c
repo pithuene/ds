@@ -4,9 +4,12 @@
 
 /* NOT EXPOSED */
 
-const __ds_pool_cell_ref_t NULL_CELL_REF = {
-  .block_idx = 0xFFFFFFFF & ((1 << DS_POOL_BLOCK_BITS) - 1),
-  .cell_idx  = 0xFFFFFFFF & ((1 << DS_POOL_CELL_BITS) - 1),
+#define MAX_BLOCKS ((((unsigned int) 1) << DS_POOL_BLOCK_BITS))
+#define MAX_CELLS_PER_BLOCK ((((unsigned int) 1) << DS_POOL_CELL_BITS))
+
+static const __ds_pool_cell_ref_t NULL_CELL_REF = {
+  .block_idx = MAX_BLOCKS - 1,
+  .cell_idx  = MAX_CELLS_PER_BLOCK - 1,
 };
 
 static inline size_t block_arr_memory_len(size_t number_of_blocks) {
@@ -25,11 +28,11 @@ static inline void **pool_allocator_from_header(__ds_pool_header_t *header) {
 // Allocate a new block, initialize the free list inside and prepend
 // the block to the old freelist head.
 static inline void *create_new_block(
-  size_t val_len,
-  size_t new_block_index,
-  __ds_pool_header_t *header
+  size_t val_len, // Length of one of the generic values
+  size_t new_block_index, // The index the new block will have
+  __ds_pool_header_t *header // Reference to the pool header, so the freelist head can be read and updated.
 ) {
-  const size_t cells_per_block = (1 << DS_POOL_CELL_BITS);
+  const size_t cells_per_block = 1 << header->next_block_capacity_power;
   const size_t block_mem_len = cells_per_block * val_len;
   void *block = malloc(block_mem_len);
 
@@ -49,9 +52,13 @@ static inline void *create_new_block(
     }
   }
   
-  header->number_of_blocks++;
   header->block_idx = new_block_index;
   header->cell_idx = 0;
+  header->number_of_blocks++;
+  header->next_block_capacity_power++;
+  if (header->next_block_capacity_power > DS_POOL_CELL_BITS) {
+    header->next_block_capacity_power = DS_POOL_CELL_BITS;
+  }
 
   return block;
 }
@@ -60,6 +67,7 @@ static inline void *create_new_block(
 
 void **__ds_new_pool_allocator(size_t val_len) {
   assert(DS_POOL_CELL_BITS + DS_POOL_BLOCK_BITS == 32);
+  assert((1 << DS_POOL_BLOCK_CAP_POW_BITS) - 1 >= DS_POOL_CELL_BITS);
 
   const size_t initial_blocks = 1;
   const size_t block_arr_mem_len = block_arr_memory_len(initial_blocks);
@@ -68,6 +76,7 @@ void **__ds_new_pool_allocator(size_t val_len) {
     .block_idx = NULL_CELL_REF.block_idx,
     .cell_idx = NULL_CELL_REF.cell_idx,
     .number_of_blocks = 0,
+    .next_block_capacity_power = 1,
   };
   void **pool_allocator = pool_allocator_from_header(header);
 
