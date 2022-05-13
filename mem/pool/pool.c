@@ -18,11 +18,15 @@ static inline size_t block_arr_memory_len(size_t number_of_blocks) {
 
 // Returns a pointer to the first block pointer for a given pool header.
 static inline void **pool_allocator_from_header(__ds_pool_header_t *header) {
-  return (void **) ++header;
+  return (void **) (header + 1);
   /* TODO: If the above doesn't work, use this.
    * return (void **) ( // Cast to return type
     ((char *) header)  // Cast to char * to move by bytes
     + sizeof(__ds_pool_header_t)); // Move over the header */
+}
+
+__ds_pool_header_t *header_from_pool_allocator(void **allocator) {
+  return ((__ds_pool_header_t *) allocator) - 1;
 }
 
 // Allocate a new block, initialize the free list inside and prepend
@@ -89,4 +93,43 @@ void **__ds_new_pool_allocator(size_t val_len) {
   }
   
   return pool_allocator;
+}
+
+void **__ds_pool_ensure_free_cell_internal(void **allocator, size_t val_len) {
+  __ds_pool_header_t *header = header_from_pool_allocator(allocator);
+
+  if (header->block_idx == NULL_CELL_REF.block_idx
+    && header->cell_idx == NULL_CELL_REF.cell_idx) {
+    // Freelist is empty
+    void *new_block = create_new_block(val_len, header->number_of_blocks, header);
+    // Add block to the blocks array
+    size_t block_arr_mem_len = block_arr_memory_len(header->number_of_blocks);
+    header = realloc((void *) header, block_arr_mem_len);
+    void **new_allocator = pool_allocator_from_header(header);
+    new_allocator[header->number_of_blocks - 1] = new_block;
+    return new_allocator;
+  } else {
+    // There is a free cell
+    return allocator;
+  }
+}
+
+uint32_t __ds_poolalloc_head_block_idx(void **allocator) {
+  __ds_pool_header_t *header = header_from_pool_allocator(allocator);
+  return header->block_idx;
+}
+
+uint32_t __ds_poolalloc_head_cell_idx(void **allocator, size_t val_len) {
+  __ds_pool_header_t *header = header_from_pool_allocator(allocator);
+
+  void *head_block = allocator[header->block_idx];
+  __ds_pool_cell_ref_t *head_cell = (__ds_pool_cell_ref_t *) (((char *) head_block) + val_len * header->cell_idx);
+
+  uint32_t old_head_cell_idx = header->cell_idx;
+
+  // Move freelist head to the next entry
+  header->block_idx = head_cell->block_idx;
+  header->cell_idx = head_cell->cell_idx;
+
+  return old_head_cell_idx;
 }

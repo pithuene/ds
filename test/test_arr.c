@@ -6,7 +6,7 @@ static MunitResult test_initialization(const MunitParameter params[], void* user
   /* Default initialization */ {
     #define LENGTH 100
     // Default initialization, all values zeroed
-    arr_t(int) array_default = arr_create(int, LENGTH);
+    arr_t(int) array_default = arr_create(int, LENGTH, {0});
 
     // Length is properly set
     assert_int(arr_len(array_default), ==, LENGTH);
@@ -39,7 +39,7 @@ void double_array(arr_t(int) array) {
 }
 
 static MunitResult test_array_parameter(const MunitParameter params[], void* user_data_or_fixture) {
-  arr_t(int) array = arr_create(int, 8);
+  arr_t(int) array = arr_create(int, 8, {0});
   for (int i = 0; i < arr_len(array); i++) {
     array[i] = i;
   }
@@ -54,7 +54,7 @@ static MunitResult test_array_parameter(const MunitParameter params[], void* use
 }
 
 static MunitResult test_safe_access(const MunitParameter params[], void* user_data_or_fixture) {
-  arr_t(int) array = arr_create(int, 8);
+  arr_t(int) array = arr_create(int, 8, {0});
   for (int i = 0; i < arr_len(array); i++) {
     array[i] = i;
   }

@@ -16,7 +16,9 @@
 #define DS_POOL_BLOCK_CAP_POW_BITS 3
 
 #ifndef DS_NO_SHORT_NAMES
-  #define pool_allocator_t ds_pool_allocator_t
+  #define pool_allocator_t   ds_pool_allocator_t
+  #define new_pool_allocator ds_new_pool_allocator
+  #define poolalloc          ds_poolalloc
 #endif /* DS_NO_SHORT_NAMES */
 
 /* INTERNAL */
@@ -41,6 +43,18 @@ typedef struct {
 
 void **__ds_new_pool_allocator(size_t val_len);
 
+// Return the block index of the freelist head
+uint32_t __ds_poolalloc_head_block_idx(void **allocator);
+// Remove the freelist head from the freelist.
+// Return the cell_idx of the removed head.
+uint32_t __ds_poolalloc_head_cell_idx(void **allocator, size_t val_len);
+
+void **__ds_pool_ensure_free_cell_internal(void **allocator, size_t val_len);
+
+// Make sure the freelist is not empty. Grow if necessary.
+#define __ds_pool_ensure_free_cell(ALLOCATOR) \
+  ((ALLOCATOR) = (void *) __ds_pool_ensure_free_cell_internal((void **) ALLOCATOR, sizeof(**ALLOCATOR)))
+
 /* EXTERNAL */
 
 #define ds_pool_allocator_t(TYPE) TYPE **
@@ -48,5 +62,10 @@ void **__ds_new_pool_allocator(size_t val_len);
 #define ds_new_pool_allocator(TYPE) \
   ((TYPE **) __ds_new_pool_allocator(sizeof(TYPE)))
 
+#define ds_poolalloc(ALLOCATOR) ( \
+  __ds_pool_ensure_free_cell(ALLOCATOR), \
+  (&(ALLOCATOR) \
+    [(__ds_poolalloc_head_block_idx((void **) ALLOCATOR))] \
+    [(__ds_poolalloc_head_cell_idx((void **) ALLOCATOR, sizeof(**(ALLOCATOR))))]))
 
 #endif

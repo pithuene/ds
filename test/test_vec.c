@@ -3,15 +3,15 @@
 #include "../vec/vec.h"
 
 static MunitResult test_initialization(const MunitParameter params[], void* user_data_or_fixture) {
-  ds_vec_t(int) vector = ds_vec_create(int, 10);
+  vec_t(int) vector = vec_create(int, 10);
 
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < vec_len(vector); i++) {
     // Items zeroed initially
     assert_int(vector[i], ==, 0);
   }
 
-  assert_uint(ds_vec_len(vector), ==, 0);
-  assert_uint(ds_vec_cap(vector), ==, 10);
+  assert_uint(vec_len(vector), ==, 0);
+  assert_uint(vec_cap(vector), ==, 10);
 
   return MUNIT_OK;
 }
