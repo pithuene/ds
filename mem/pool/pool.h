@@ -2,6 +2,7 @@
 #define DS_POOL_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 // The number of bits of a 32bit pool_cell_ref which identify a cell in a given pool.
@@ -11,14 +12,11 @@
 // There can be up to 2^DS_POOL_BLOCK_BITS blocks.
 #define DS_POOL_BLOCK_BITS 25
 
-// The number of bits used to express the power of the block capacity.
-// The maximum expressable block capacity is therefore (2^DS_POOL_BLOCK_CAP_POW_BITS) - 1.
-#define DS_POOL_BLOCK_CAP_POW_BITS 3
-
 #ifndef DS_NO_SHORT_NAMES
   #define pool_allocator_t   ds_pool_allocator_t
   #define new_pool_allocator ds_new_pool_allocator
   #define poolalloc          ds_poolalloc
+  #define poolfree           ds_poolfree
 #endif /* DS_NO_SHORT_NAMES */
 
 /* INTERNAL */
@@ -35,10 +33,7 @@ typedef struct {
 typedef struct {
   uint64_t block_idx           : DS_POOL_BLOCK_BITS;
   uint64_t cell_idx            : DS_POOL_CELL_BITS;
-  uint64_t number_of_blocks    : DS_POOL_BLOCK_BITS;
-  // Block capacity is always a power of two.
-  // The next block will have 2^next_block_capacity_power cells.
-  uint64_t next_block_capacity_power : DS_POOL_BLOCK_CAP_POW_BITS;
+  uint64_t number_of_blocks    : 32;
 } __ds_pool_header_t;
 
 void **__ds_new_pool_allocator(size_t val_len);
@@ -50,6 +45,8 @@ uint32_t __ds_poolalloc_head_block_idx(void **allocator);
 uint32_t __ds_poolalloc_head_cell_idx(void **allocator, size_t val_len);
 
 void **__ds_pool_ensure_free_cell_internal(void **allocator, size_t val_len);
+
+bool __ds_poolfree_internal(void **allocator, void *cell, size_t val_len);
 
 // Make sure the freelist is not empty. Grow if necessary.
 #define __ds_pool_ensure_free_cell(ALLOCATOR) \
@@ -67,5 +64,8 @@ void **__ds_pool_ensure_free_cell_internal(void **allocator, size_t val_len);
   (&(ALLOCATOR) \
     [(__ds_poolalloc_head_block_idx((void **) ALLOCATOR))] \
     [(__ds_poolalloc_head_cell_idx((void **) ALLOCATOR, sizeof(**(ALLOCATOR))))]))
+
+#define ds_poolfree(ALLOCATOR, CELL) \
+  __ds_poolfree_internal((void **) ALLOCATOR, (void *) CELL, sizeof(**ALLOCATOR))
 
 #endif

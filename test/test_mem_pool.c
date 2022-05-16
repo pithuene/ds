@@ -16,6 +16,15 @@ static MunitResult test_pow2(const MunitParameter params[], void* user_data_or_f
   return MUNIT_OK;
 }
 
+static MunitResult test_get_block_capacity(const MunitParameter params[], void* user_data_or_fixture) {
+  size_t expected[] = {2,4,8,16,32,64,128};
+  for (int i = 0; i < (sizeof(expected) / sizeof(*expected)); i++) {
+    assert_uint(get_block_capacity(i), ==, expected[i]);
+  }
+
+  return MUNIT_OK;
+}
+
 static MunitResult test_header_access(const MunitParameter params[], void* user_data_or_fixture) {
   pool_allocator_t(uint64_t) allocator = new_pool_allocator(uint64_t);
   __ds_pool_header_t *header = header_from_pool_allocator((void **) allocator);
@@ -45,6 +54,17 @@ static MunitResult test_freelist_is_empty(const MunitParameter params[], void* u
   return MUNIT_OK;
 }
 
+static MunitResult test_is_cell_in_block(const MunitParameter params[], void* user_data_or_fixture) {
+  pool_allocator_t(uint64_t) allocator = new_pool_allocator(uint64_t);
+  uint64_t *val = poolalloc(allocator);
+
+  assert(is_cell_in_block(allocator[0], 0, val, sizeof(uint64_t)));
+  assert(!is_cell_in_block(allocator[0], 0, val - 1, sizeof(uint64_t)));
+  assert(!is_cell_in_block(allocator[0], 0, val - 2, sizeof(uint64_t)));
+
+  return MUNIT_OK;
+}
+
 static MunitResult test_allocation(const MunitParameter params[], void* user_data_or_fixture) {
   pool_allocator_t(uint64_t) palloc = new_pool_allocator(uint64_t);
 
@@ -68,6 +88,15 @@ static MunitResult test_allocation(const MunitParameter params[], void* user_dat
   // These blocks are all completely filled, so the freelist is empty
   assert(freelist_is_empty(header));
 
+  {
+    // Free one value
+    poolfree(palloc, vals[VAL_COUNT - 1]);
+    // Allocate it again
+    vals[VAL_COUNT - 1] = poolalloc(palloc);
+    // If the freed cell was properly reused, no new block should have been allocated.
+    assert_uint64(header->number_of_blocks, ==, 6);
+  }
+
   // Allocating one more slot will allocate a new block internally
   uint64_t *another_val = poolalloc(palloc);
   *another_val = 1234;
@@ -78,13 +107,27 @@ static MunitResult test_allocation(const MunitParameter params[], void* user_dat
   assert_uint64(header->number_of_blocks, ==, 7);
   assert(!freelist_is_empty(header));
 
+  __ds_pool_cell_ref_t head_before_free = freelist_head(header);
+  // Free a value
+  poolfree(palloc, another_val);
+  // Freeing should have changed the freelist head
+  assert(!cell_refs_equal(head_before_free, freelist_head(header)));
+  // Allocate the same slot again
+  uint64_t *another_val_again = poolalloc(palloc);
+  // Free list should be the same again
+  assert(cell_refs_equal(head_before_free, freelist_head(header)));
+  // Same slot allocated
+  assert_ptr_equal(another_val, another_val_again);
+
   return MUNIT_OK;
 }
 
 static MunitTest tests[] = {
   {"/pow2", test_pow2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/get_block_capacity", test_get_block_capacity, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/header_access", test_header_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/freelist_is_empty", test_freelist_is_empty, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/is_cell_in_block", test_is_cell_in_block, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/allocation", test_allocation, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };

@@ -25,7 +25,13 @@ test: test/test
 
 .PHONY: coverage
 coverage: test
-	gcovr -s --html-details ./coverage/coverage.html --exclude test/test.c --exclude test/munit/munit.c --exclude test/test_arr.c --exclude test/test_vec.c --exclude test/test_mem_pool.c
+	gcovr -s \
+		--exclude-lines-by-pattern '\s*assert\(.*' \
+		--exclude-unreachable-branches \
+		--html-details ./coverage/coverage.html \
+		--exclude test/test.c \
+		--exclude test/munit/munit.c \
+		--exclude test/test_arr.c --exclude test/test_vec.c --exclude test/test_mem_pool.c
 	xdg-open ./coverage/coverage.html
 
 # Remove all previous coverage data
