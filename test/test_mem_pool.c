@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-__ds_pool_header_t *header_from_pool_allocator(void **allocator);
+#include "../mem/pool/pool.c"
 
 static MunitResult test_pow2(const MunitParameter params[], void* user_data_or_fixture) {
   #define POW2(X) (1 << X)
@@ -15,13 +15,6 @@ static MunitResult test_pow2(const MunitParameter params[], void* user_data_or_f
   }
 
   return MUNIT_OK;
-}
-
-static bool freelist_is_empty(__ds_pool_header_t *header) {
-  #define MAX_BLOCKS ((((unsigned int) 1) << DS_POOL_BLOCK_BITS))
-  #define MAX_CELLS_PER_BLOCK ((((unsigned int) 1) << DS_POOL_CELL_BITS))
-  return header->block_idx == MAX_BLOCKS - 1
-    && header->cell_idx == MAX_CELLS_PER_BLOCK - 1;
 }
 
 static MunitResult test_allocation(const MunitParameter params[], void* user_data_or_fixture) {

@@ -16,8 +16,8 @@ libds.a: $(IMPL_OBJS)
 $(TEST_OBJS): test/%.o: test/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-test/test: $(TEST_OBJS) libds.a clean-coverage
-	$(CC) $(CFLAGS_DEBUG) -lm -o test/test test/test.c $(TEST_OBJS) libds.a test/munit/munit.c
+test/test: $(TEST_SRCS) $(IMPL_SRCS) clean-coverage
+	$(CC) $(CFLAGS_DEBUG) -lm -o test/test test/test.c $(TEST_SRCS) test/munit/munit.c
 
 .PHONY: test
 test: test/test

@@ -1,6 +1,7 @@
 #define MUNIT_ENABLE_ASSERT_ALIASES
 #include "munit/munit.h"
 #include "../vec/vec.h"
+#include "../vec/vec.c"
 
 static MunitResult test_initialization(const MunitParameter params[], void* user_data_or_fixture) {
   vec_t(int) vector = vec_create(int, 10);

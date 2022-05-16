@@ -1,5 +1,6 @@
 #include "pool.h"
 #include <stdlib.h>
+#include <stdbool.h>
 #include <assert.h>
 
 /* NOT EXPOSED */
@@ -25,12 +26,26 @@ static inline void **pool_allocator_from_header(__ds_pool_header_t *header) {
     + sizeof(__ds_pool_header_t)); // Move over the header */
 }
 
-__ds_pool_header_t *header_from_pool_allocator(void **allocator) {
+static inline __ds_pool_header_t *header_from_pool_allocator(void **allocator) {
   return ((__ds_pool_header_t *) allocator) - 1;
+}
+
+static inline void *get_allocator_block(void **allocator, uint32_t block_idx) {
+  return allocator[block_idx];
+}
+
+static inline __ds_pool_cell_ref_t *get_block_cell(void *block, uint32_t cell_idx, size_t val_len) {
+  return (__ds_pool_cell_ref_t *) (((char *) block) + val_len * cell_idx);
+}
+
+static inline bool freelist_is_empty(__ds_pool_header_t *header) {
+  return header->block_idx == MAX_BLOCKS - 1
+      && header->cell_idx == MAX_CELLS_PER_BLOCK - 1;
 }
 
 // Allocate a new block, initialize the free list inside and prepend
 // the block to the old freelist head.
+// The new block still needs to be added to the blocks array.
 static inline void *create_new_block(
   size_t val_len, // Length of one of the generic values
   size_t new_block_index, // The index the new block will have
@@ -67,6 +82,17 @@ static inline void *create_new_block(
   return block;
 }
 
+// Append a given block to the end of the block array.
+// Returns the pointer to the allocator as this may have changed
+// through realloc.
+static inline void **append_new_block(__ds_pool_header_t *header, void *new_block) {
+  size_t block_arr_mem_len = block_arr_memory_len(header->number_of_blocks);
+  header = realloc((void *) header, block_arr_mem_len);
+  void **new_allocator = pool_allocator_from_header(header);
+  new_allocator[header->number_of_blocks - 1] = new_block;
+  return new_allocator;
+}
+
 /* INTERNAL */
 
 void **__ds_new_pool_allocator(size_t val_len) {
@@ -87,7 +113,7 @@ void **__ds_new_pool_allocator(size_t val_len) {
   /* Initialize the individual blocks */ {
     void **curr_block = NULL;
     for (size_t curr_block_idx = 0; curr_block_idx < initial_blocks; curr_block_idx++) {
-      curr_block = &pool_allocator[curr_block_idx];
+      curr_block = pool_allocator + curr_block_idx;
       *curr_block = create_new_block(val_len, curr_block_idx, header);
     }
   }
@@ -97,33 +123,30 @@ void **__ds_new_pool_allocator(size_t val_len) {
 
 void **__ds_pool_ensure_free_cell_internal(void **allocator, size_t val_len) {
   __ds_pool_header_t *header = header_from_pool_allocator(allocator);
-
-  if (header->block_idx == NULL_CELL_REF.block_idx
-    && header->cell_idx == NULL_CELL_REF.cell_idx) {
-    // Freelist is empty
+  if (
+    header->block_idx == NULL_CELL_REF.block_idx &&
+    header->cell_idx == NULL_CELL_REF.cell_idx
+  ) {
+    // Freelist is empty, there are no free cells left.
     void *new_block = create_new_block(val_len, header->number_of_blocks, header);
-    // Add block to the blocks array
-    size_t block_arr_mem_len = block_arr_memory_len(header->number_of_blocks);
-    header = realloc((void *) header, block_arr_mem_len);
-    void **new_allocator = pool_allocator_from_header(header);
-    new_allocator[header->number_of_blocks - 1] = new_block;
-    return new_allocator;
-  } else {
-    // There is a free cell
-    return allocator;
+    allocator = append_new_block(header, new_block);
   }
+  return allocator;
 }
 
+// Get the freelist head block index
 uint32_t __ds_poolalloc_head_block_idx(void **allocator) {
   __ds_pool_header_t *header = header_from_pool_allocator(allocator);
   return header->block_idx;
 }
 
+// Get the freelist head cell index
+// **and remove the head from the freelist**.
 uint32_t __ds_poolalloc_head_cell_idx(void **allocator, size_t val_len) {
   __ds_pool_header_t *header = header_from_pool_allocator(allocator);
 
-  void *head_block = allocator[header->block_idx];
-  __ds_pool_cell_ref_t *head_cell = (__ds_pool_cell_ref_t *) (((char *) head_block) + val_len * header->cell_idx);
+  void *head_block = get_allocator_block(allocator, header->block_idx);
+  __ds_pool_cell_ref_t *head_cell = get_block_cell(head_block, header->cell_idx, val_len);
 
   uint32_t old_head_cell_idx = header->cell_idx;
 
