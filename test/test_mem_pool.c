@@ -17,6 +17,15 @@ static MunitResult test_pow2(const MunitParameter params[], void* user_data_or_f
   return MUNIT_OK;
 }
 
+static MunitResult test_header_access(const MunitParameter params[], void* user_data_or_fixture) {
+  pool_allocator_t(uint64_t) allocator = new_pool_allocator(uint64_t);
+  __ds_pool_header_t *header = header_from_pool_allocator((void **) allocator);
+  assert_uint(header->block_idx, ==, 0);
+  void **returned_allocator = pool_allocator_from_header(header);
+  assert_ptr_equal(allocator, returned_allocator);
+  return MUNIT_OK;
+}
+
 static MunitResult test_allocation(const MunitParameter params[], void* user_data_or_fixture) {
   pool_allocator_t(uint64_t) palloc = new_pool_allocator(uint64_t);
 
@@ -55,6 +64,7 @@ static MunitResult test_allocation(const MunitParameter params[], void* user_dat
 
 static MunitTest tests[] = {
   {"/pow2", test_pow2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/header_access", test_header_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/allocation", test_allocation, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };

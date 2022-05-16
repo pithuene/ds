@@ -20,10 +20,6 @@ static inline size_t block_arr_memory_len(size_t number_of_blocks) {
 // Returns a pointer to the first block pointer for a given pool header.
 static inline void **pool_allocator_from_header(__ds_pool_header_t *header) {
   return (void **) (header + 1);
-  /* TODO: If the above doesn't work, use this.
-   * return (void **) ( // Cast to return type
-    ((char *) header)  // Cast to char * to move by bytes
-    + sizeof(__ds_pool_header_t)); // Move over the header */
 }
 
 static inline __ds_pool_header_t *header_from_pool_allocator(void **allocator) {
