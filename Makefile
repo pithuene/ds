@@ -31,7 +31,7 @@ coverage: test
 		--html-details ./coverage/coverage.html \
 		--exclude test/test.c \
 		--exclude test/munit/munit.c \
-		--exclude test/test_arr.c --exclude test/test_vec.c --exclude test/test_mem_pool.c
+		$(foreach src,$(patsubst ./test/%.c,test/%.c,$(TEST_SRCS)),--exclude $(src))
 	xdg-open ./coverage/coverage.html
 
 # Remove all previous coverage data
