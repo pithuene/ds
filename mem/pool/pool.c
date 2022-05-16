@@ -5,8 +5,11 @@
 
 /* NOT EXPOSED */
 
-#define MAX_BLOCKS ((((unsigned int) 1) << DS_POOL_BLOCK_BITS))
-#define MAX_CELLS_PER_BLOCK ((((unsigned int) 1) << DS_POOL_CELL_BITS))
+// Calculate 2^X
+#define POW2(X) (1 << X)
+
+#define MAX_BLOCKS POW2(DS_POOL_BLOCK_BITS)
+#define MAX_CELLS_PER_BLOCK POW2(DS_POOL_CELL_BITS)
 
 static const __ds_pool_cell_ref_t NULL_CELL_REF = {
   .block_idx = MAX_BLOCKS - 1,
@@ -47,7 +50,7 @@ static inline void *create_new_block(
   size_t new_block_index, // The index the new block will have
   __ds_pool_header_t *header // Reference to the pool header, so the freelist head can be read and updated.
 ) {
-  const size_t cells_per_block = 1 << header->next_block_capacity_power;
+  const size_t cells_per_block = POW2(header->next_block_capacity_power);
   const size_t block_mem_len = cells_per_block * val_len;
   void *block = malloc(block_mem_len);
 
@@ -93,7 +96,7 @@ static inline void **append_new_block(__ds_pool_header_t *header, void *new_bloc
 
 void **__ds_new_pool_allocator(size_t val_len) {
   assert(DS_POOL_CELL_BITS + DS_POOL_BLOCK_BITS == 32);
-  assert((1 << DS_POOL_BLOCK_CAP_POW_BITS) - 1 >= DS_POOL_CELL_BITS);
+  assert(POW2(DS_POOL_BLOCK_CAP_POW_BITS) - 1 >= DS_POOL_CELL_BITS);
 
   const size_t initial_blocks = 1;
   const size_t block_arr_mem_len = block_arr_memory_len(initial_blocks);
@@ -119,10 +122,7 @@ void **__ds_new_pool_allocator(size_t val_len) {
 
 void **__ds_pool_ensure_free_cell_internal(void **allocator, size_t val_len) {
   __ds_pool_header_t *header = header_from_pool_allocator(allocator);
-  if (
-    header->block_idx == NULL_CELL_REF.block_idx &&
-    header->cell_idx == NULL_CELL_REF.cell_idx
-  ) {
+  if (freelist_is_empty(header)) {
     // Freelist is empty, there are no free cells left.
     void *new_block = create_new_block(val_len, header->number_of_blocks, header);
     allocator = append_new_block(header, new_block);

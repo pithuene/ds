@@ -7,7 +7,6 @@
 #include "../mem/pool/pool.c"
 
 static MunitResult test_pow2(const MunitParameter params[], void* user_data_or_fixture) {
-  #define POW2(X) (1 << X)
   #define TEST_POW(X) assert_int((int)(pow(2, X) + 0.5), ==, POW2(X))
 
   for (int i = 1; i < 16; i++) {
@@ -23,6 +22,26 @@ static MunitResult test_header_access(const MunitParameter params[], void* user_
   assert_uint(header->block_idx, ==, 0);
   void **returned_allocator = pool_allocator_from_header(header);
   assert_ptr_equal(allocator, returned_allocator);
+  return MUNIT_OK;
+}
+
+static MunitResult test_freelist_is_empty(const MunitParameter params[], void* user_data_or_fixture) {
+  __ds_pool_header_t header = {
+    .block_idx = 0,
+    .cell_idx = 0,
+  };
+  assert(!freelist_is_empty(&header));
+
+  header.block_idx = MAX_BLOCKS - 1;
+  assert(!freelist_is_empty(&header));
+
+  header.block_idx--;
+  header.cell_idx = MAX_CELLS_PER_BLOCK - 1;
+  assert(!freelist_is_empty(&header));
+
+  header.block_idx = MAX_BLOCKS - 1;
+  assert(freelist_is_empty(&header));
+  
   return MUNIT_OK;
 }
 
@@ -65,6 +84,7 @@ static MunitResult test_allocation(const MunitParameter params[], void* user_dat
 static MunitTest tests[] = {
   {"/pow2", test_pow2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/header_access", test_header_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/freelist_is_empty", test_freelist_is_empty, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/allocation", test_allocation, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
