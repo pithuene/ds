@@ -2,8 +2,20 @@
 #include "munit/munit.h"
 #include "../mem/pool/pool.h"
 #include <stdbool.h>
+#include <math.h>
 
 __ds_pool_header_t *header_from_pool_allocator(void **allocator);
+
+static MunitResult test_pow2(const MunitParameter params[], void* user_data_or_fixture) {
+  #define POW2(X) (1 << X)
+  #define TEST_POW(X) assert_int((int)(pow(2, X) + 0.5), ==, POW2(X))
+
+  for (int i = 1; i < 16; i++) {
+    TEST_POW(i);
+  }
+
+  return MUNIT_OK;
+}
 
 static bool freelist_is_empty(__ds_pool_header_t *header) {
   #define MAX_BLOCKS ((((unsigned int) 1) << DS_POOL_BLOCK_BITS))
@@ -49,6 +61,7 @@ static MunitResult test_allocation(const MunitParameter params[], void* user_dat
 }
 
 static MunitTest tests[] = {
+  {"/pow2", test_pow2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/allocation", test_allocation, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
