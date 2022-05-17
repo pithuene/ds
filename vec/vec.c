@@ -19,7 +19,7 @@ static inline void *vec_from_header(__ds_vec_header_t *header) {
 
 void *__ds_vec_create(size_t val_len, size_t cap) {
   const size_t memory_length = vec_memory_length(cap, val_len);
-  __ds_vec_header_t *header = (__ds_vec_header_t *) calloc(1, memory_length);
+  __ds_vec_header_t *header = (__ds_vec_header_t *) malloc(memory_length);
   *header = (__ds_vec_header_t){
     .len = 0,
     .cap = cap,

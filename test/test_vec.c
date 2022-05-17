@@ -17,11 +17,6 @@ static MunitResult test_header_access(const MunitParameter params[], void* user_
 static MunitResult test_initialization(const MunitParameter params[], void* user_data_or_fixture) {
   vec_t(int) vector = vec_create(int, 10);
 
-  for (int i = 0; i < vec_cap(vector); i++) {
-    // Items zeroed initially
-    assert_int(vector[i], ==, 0);
-  }
-
   assert_uint(vec_len(vector), ==, 0);
   assert_uint(vec_cap(vector), ==, 10);
 
@@ -30,12 +25,17 @@ static MunitResult test_initialization(const MunitParameter params[], void* user
 
 static MunitResult test_grow(const MunitParameter params[], void* user_data_or_fixture) {
   vec_t(int) vector = vec_create(int, 10);
+
   assert_uint(vec_len(vector), ==, 0);
   assert_uint(vec_cap(vector), ==, 10);
+
   vec_grow(vector, 20);
+
   assert_uint(vec_len(vector), ==, 0);
   assert_uint(vec_cap(vector), ==, 20);
+
   vector[19] = 123; // Can access new slots
+
   return MUNIT_OK;
 }
 
