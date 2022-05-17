@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <assert.h>
 
 #ifndef DS_NO_SHORT_NAMES
   #define vec_t       ds_vec_t
@@ -38,5 +39,7 @@ size_t ds_vec_len(void *vec);
 size_t ds_vec_cap(void *vec);
 #define ds_vec_grow(VEC, NEWCAP) \
   ((VEC) = __ds_vec_grow_internal(VEC, NEWCAP, sizeof(*VEC)))
+#define ds_vec_get(VEC, IDX) (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX])
+#define ds_vec_set(VEC, IDX, VAL) (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX] = (VAL))
 
 #endif /* DS_VEC_H */

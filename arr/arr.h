@@ -21,6 +21,6 @@
 
 #define ds_arr_get(ARR, IDX) (assert(IDX >= 0), assert(IDX < ds_arr_len(ARR)), ARR[IDX])
 
-#define ds_arr_set(ARR, IDX, VAL) (assert(IDX >= 0), assert(IDX < ds_arr_len(ARR)), ARR[IDX] = VAL)
+#define ds_arr_set(ARR, IDX, VAL) (assert(IDX >= 0), assert(IDX < ds_arr_len(ARR)), ARR[IDX] = (VAL))
 
 #endif /* DS_ARR_H */
