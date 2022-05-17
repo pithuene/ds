@@ -32,15 +32,15 @@ __ds_vec_header_t *__ds_vec_header(void *vec) {
   return (__ds_vec_header_t *) header;
 }
 
-// Grow the vector to a given new capacity.
-// New capacity must be greater or equal to the current capacity.
+// Ensure the vector has space for a given number of elements.
+// Reallocates the vector if necessary.
 // Returns the vector since it may have moved.
-void *__ds_vec_grow_internal(void *vec, size_t new_cap, size_t val_len) {
+void *__ds_vec_reserve_internal(void *vec, size_t new_cap, size_t val_len) {
   __ds_vec_header_t *header = __ds_vec_header(vec);
-  if (header->cap == new_cap) {
+  if (header->cap >= new_cap) {
+    // Capacity sufficient
     return vec;
   }
-  assert(new_cap >= header->cap); // Can't shrink
   header = (__ds_vec_header_t *) realloc(header, vec_memory_length(new_cap, val_len));
   header->cap = new_cap;
   return vec_from_header(header);

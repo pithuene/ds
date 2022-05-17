@@ -23,13 +23,13 @@ static MunitResult test_initialization(const MunitParameter params[], void* user
   return MUNIT_OK;
 }
 
-static MunitResult test_grow(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_reserve(const MunitParameter params[], void* user_data_or_fixture) {
   vec_t(int) vector = vec_create(int, 10);
 
   assert_uint(vec_len(vector), ==, 0);
   assert_uint(vec_cap(vector), ==, 10);
 
-  vec_grow(vector, 20);
+  vec_reserve(vector, 20);
 
   assert_uint(vec_len(vector), ==, 0);
   assert_uint(vec_cap(vector), ==, 20);
@@ -42,7 +42,7 @@ static MunitResult test_grow(const MunitParameter params[], void* user_data_or_f
 static MunitTest tests[] = {
   {"/header_access", test_header_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/initialization", test_initialization, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-  {"/grow", test_grow, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/reserve", test_reserve, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
 
