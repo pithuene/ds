@@ -7,11 +7,11 @@ IMPL_OBJS = $(patsubst ./%.c,./%.o,$(IMPL_SRCS))
 TEST_SRCS = ./test/test_arr.c ./test/test_vec.c ./test/test_mem_pool.c
 TEST_OBJS = $(patsubst ./%.c,./%.o,$(TEST_SRCS))
 
-$(IMPL_OBJS): ./%.o: ./%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
-
 libds.a: $(IMPL_OBJS)
 	ar -rc libds.a $(IMPL_OBJS)
+
+$(IMPL_OBJS): ./%.o: ./%.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(TEST_OBJS): test/%.o: test/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<

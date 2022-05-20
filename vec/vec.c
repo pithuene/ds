@@ -51,6 +51,8 @@ size_t __ds_vec_capacity_after_push(void *vec) {
   __ds_vec_header_t *header = __ds_vec_header(vec);
   if (header->len < header->cap) {
     return header->cap;
+  } else if (header->cap == 0) {
+    return 1;
   } else {
     return header->cap * 2;
   }

@@ -39,6 +39,17 @@ static MunitResult test_reserve(const MunitParameter params[], void* user_data_o
   return MUNIT_OK;
 }
 
+static MunitResult test_empty_vec(const MunitParameter params[], void* user_data_or_fixture) {
+  vec_t(int) vector = vec_create(int, 0);
+  assert_uint(vec_len(vector), ==, 0);
+  assert_uint(vec_cap(vector), ==, 0);
+  vec_push(vector, 1234);
+  assert_uint(vec_len(vector), ==, 1);
+  assert_uint(vec_cap(vector), ==, 1);
+
+  return MUNIT_OK;
+}
+
 static MunitResult test_push(const MunitParameter params[], void* user_data_or_fixture) {
   vec_t(int) vector = vec_create(int, 10);
   assert_uint(vec_len(vector), ==, 0);
@@ -66,6 +77,7 @@ static MunitTest tests[] = {
   {"/initialization", test_initialization, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/reserve", test_reserve, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/push", test_push, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/empty_vec", test_empty_vec, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
 
