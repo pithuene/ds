@@ -46,6 +46,16 @@ void *__ds_vec_reserve_internal(void *vec, size_t new_cap, size_t val_len) {
   return vec_from_header(header);
 }
 
+// Calculate the new capacity after another item is pushed.
+size_t __ds_vec_capacity_after_push(void *vec) {
+  __ds_vec_header_t *header = __ds_vec_header(vec);
+  if (header->len < header->cap) {
+    return header->cap;
+  } else {
+    return header->cap * 2;
+  }
+}
+
 /* EXTERNAL */
 
 size_t ds_vec_len(void *vec) {

@@ -28,6 +28,7 @@ typedef struct {
 void *__ds_vec_create(size_t val_len, size_t cap);
 __ds_vec_header_t *__ds_vec_header(void *vec);
 void *__ds_vec_reserve_internal(void *vec, size_t new_cap, size_t val_len);
+size_t __ds_vec_capacity_after_push(void *vec);
 
 /* EXTERNAL */
 
@@ -41,5 +42,8 @@ size_t ds_vec_cap(void *vec);
   ((VEC) = __ds_vec_reserve_internal(VEC, NEWCAP, sizeof(*VEC)))
 #define ds_vec_get(VEC, IDX) (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX])
 #define ds_vec_set(VEC, IDX, VAL) (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX] = (VAL))
+#define ds_vec_push(VEC, VAL) ( \
+  ds_vec_reserve(VEC, __ds_vec_header(VEC)->cap = __ds_vec_capacity_after_push(VEC)), \
+  (VEC)[__ds_vec_header(VEC)->len++] = (VAL))
 
 #endif /* DS_VEC_H */

@@ -39,10 +39,33 @@ static MunitResult test_reserve(const MunitParameter params[], void* user_data_o
   return MUNIT_OK;
 }
 
+static MunitResult test_push(const MunitParameter params[], void* user_data_or_fixture) {
+  vec_t(int) vector = vec_create(int, 10);
+  assert_uint(vec_len(vector), ==, 0);
+
+  for (int i = 0; i < 10; i++) {
+    vec_push(vector, i*i);
+  }
+  assert_uint(vec_len(vector), ==, 10);
+  assert_uint(vec_cap(vector), ==, 10);
+  for (int i = 0; i < 10; i++) {
+    assert_int(vector[i], ==, i*i);
+  }
+
+  // Pushing one more value should double capacity
+  vec_push(vector, 1234);
+  assert_int(vector[10], ==, 1234);
+  assert_uint(vec_len(vector), ==, 11);
+  assert_uint(vec_cap(vector), ==, 20);
+
+  return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
   {"/header_access", test_header_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/initialization", test_initialization, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/reserve", test_reserve, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/push", test_push, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
 
