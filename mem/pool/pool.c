@@ -155,7 +155,7 @@ static inline __ds_pool_cell_ref_t cellref_for_cell(
     return NULL_CELL_REF;
   }
   void *block = get_allocator_block(allocator, block_idx);
-  const ptrdiff_t offset_in_block = cell - block;
+  const ptrdiff_t offset_in_block = (char *) cell - (char *) block;
   assert(offset_in_block % val_len == 0);
   uint32_t cell_idx = offset_in_block / val_len;
   return (__ds_pool_cell_ref_t){
