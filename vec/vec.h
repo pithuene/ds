@@ -16,6 +16,8 @@
   #define vec_rm_swap ds_vec_rm_swap
   #define vec_rm      ds_vec_rm
   #define vec_free    ds_vec_free
+  #define vec_get     ds_vec_get
+  #define vec_set     ds_vec_set
 #endif /* DS_NO_SHORT_NAMES */
 
 /* INTERNAL */

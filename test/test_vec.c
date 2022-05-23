@@ -36,6 +36,11 @@ static MunitResult test_reserve(const MunitParameter params[], void* user_data_o
 
   vector[19] = 123; // Can access new slots
 
+  vec_reserve(vector, 200);
+
+  assert_uint(vec_len(vector), ==, 0);
+  assert_uint(vec_cap(vector), ==, 200);
+
   return MUNIT_OK;
 }
 
@@ -72,12 +77,30 @@ static MunitResult test_push(const MunitParameter params[], void* user_data_or_f
   return MUNIT_OK;
 }
 
+static MunitResult test_safe_access(const MunitParameter params[], void* user_data_or_fixture) {
+  vec_t(int) vector = vec_create(int, 8);
+  for (int i = 0; i < vec_cap(vector); i++) {
+    vec_push(vector, i);
+  }
+  assert_uint(vec_len(vector), ==, 8);
+
+  assert(vec_get(vector, 1) == vector[1]);
+  assert(vec_get(vector, 1) == 1);
+
+  vec_set(vector, 1, 123);
+
+  assert(vec_get(vector, 1) == 123);
+
+  return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
   {"/header_access", test_header_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/initialization", test_initialization, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/reserve", test_reserve, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/push", test_push, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/empty_vec", test_empty_vec, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/safe_access", test_safe_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
 
