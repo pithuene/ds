@@ -156,7 +156,10 @@ static inline __ds_pool_cell_ref_t cellref_for_cell(
   }
   void *block = get_allocator_block(allocator, block_idx);
   const ptrdiff_t offset_in_block = (char *) cell - (char *) block;
-  assert(offset_in_block % val_len == 0);
+  if (offset_in_block % val_len != 0) {
+    assert(false && "Failed to find cellref. Pointer does not reference the start of a cell.");
+    return NULL_CELL_REF;
+  }
   uint32_t cell_idx = offset_in_block / val_len;
   return (__ds_pool_cell_ref_t){
     .block_idx = block_idx,

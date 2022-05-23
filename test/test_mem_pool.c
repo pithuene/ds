@@ -119,6 +119,10 @@ static MunitResult test_allocation(const MunitParameter params[], void* user_dat
   // Same slot allocated
   assert_ptr_equal(another_val, another_val_again);
 
+  /* Free an invalid pointer */ {
+    assert(poolfree(palloc, NULL) == false);
+  }
+
   return MUNIT_OK;
 }
 
