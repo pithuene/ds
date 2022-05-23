@@ -17,7 +17,7 @@ $(TEST_OBJS): test/%.o: test/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 test/test: $(TEST_SRCS) $(IMPL_SRCS) clean-coverage
-	$(CC) $(CFLAGS_DEBUG) -lm -o test/test test/test.c $(TEST_SRCS) test/munit/munit.c
+	$(CC) $(CFLAGS_DEBUG) -o test/test test/test.c $(TEST_SRCS) test/munit/munit.c -lm
 
 .PHONY: test
 test: test/test
