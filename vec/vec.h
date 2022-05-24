@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <assert.h>
 
 #ifndef DS_NO_SHORT_NAMES
@@ -18,6 +19,8 @@
   #define vec_free    ds_vec_free
   #define vec_get     ds_vec_get
   #define vec_set     ds_vec_set
+  #define vec_qsort   ds_vec_qsort
+  #define vec_bsearch ds_vec_bsearch
 #endif /* DS_NO_SHORT_NAMES */
 
 /* INTERNAL */
@@ -47,5 +50,9 @@ size_t ds_vec_cap(void *vec);
 #define ds_vec_push(VEC, VAL) ( \
   ds_vec_reserve(VEC, __ds_vec_header(VEC)->cap = __ds_vec_capacity_after_push(VEC)), \
   (VEC)[__ds_vec_header(VEC)->len++] = (VAL))
+#define ds_vec_qsort(VEC, COMPAR_FN) \
+  qsort(VEC, ds_vec_len(VEC), sizeof(*(VEC)), (__compar_fn_t) (COMPAR_FN))
+#define ds_vec_bsearch(VEC, KEY, COMPAR_FN) \
+  bsearch(KEY, VEC, ds_vec_len(VEC), sizeof(*(VEC)), (__compar_fn_t) COMPAR_FN)
 
 #endif /* DS_VEC_H */

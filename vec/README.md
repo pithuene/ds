@@ -42,6 +42,22 @@ Ensure the vector has sufficient capacity to store 100 items
 vec_reserve(vector, 100);
 ```
 
+Sort the vector using quicksort:
+``` c
+int int_compare(int *a, int *b) {
+  return *a - *b;
+}
+
+vec_qsort(vector, int_compare);
+```
+
+Search through the elements of an ordered vector using binary search.
+If there is no result, the function returns a null pointer.
+Note that the search key must be a pointer.
+``` c
+int *result = vec_bsearch(vector, &(int){3}, int_compare);
+```
+
 Memory layout
 -------------
 

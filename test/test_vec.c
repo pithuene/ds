@@ -94,6 +94,35 @@ static MunitResult test_safe_access(const MunitParameter params[], void* user_da
   return MUNIT_OK;
 }
 
+static int int_compare(int *a, int *b) {
+  return *a - *b;
+}
+
+static MunitResult test_qsort_bsearch(const MunitParameter params[], void* user_data_or_fixture) {
+  vec_t(int) vector = vec_create(int, 8);
+
+  int input[] = {4,2,3,1,8,5,11,6};
+  for (int i = 0; i < 8; i++) {
+    vec_push(vector, input[i]);
+  }
+
+  vec_qsort(vector, int_compare);
+
+  int expected[] = {
+    1,2,3,4,5,6,8,11
+  };
+  assert_memory_equal(vec_len(vector) * sizeof(*vector), vector, expected);
+
+  int *found = vec_bsearch(vector, &(int){3}, int_compare);
+  assert_not_null(found);
+  assert_int(*found, ==, 3);
+
+  int *not_found = vec_bsearch(vector, &(int){7}, int_compare);
+  assert_null(not_found);
+
+  return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
   {"/header_access", test_header_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/initialization", test_initialization, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
@@ -101,6 +130,7 @@ static MunitTest tests[] = {
   {"/push", test_push, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/empty_vec", test_empty_vec, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/safe_access", test_safe_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/qsort_bsearch", test_qsort_bsearch, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
 

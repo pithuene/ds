@@ -69,10 +69,34 @@ static MunitResult test_safe_access(const MunitParameter params[], void* user_da
   return MUNIT_OK;
 }
 
+static int int_compare(int *a, int *b) {
+  return *a - *b;
+}
+
+static MunitResult test_qsort_bsearch(const MunitParameter params[], void* user_data_or_fixture) {
+  arr_t(int) array = arr_create(int, 8, {4,2,3,1,8,5,11,6});
+  arr_qsort(array, int_compare);
+
+  int expected[] = {
+    1,2,3,4,5,6,8,11
+  };
+  assert_memory_equal(arr_len(array) * sizeof(*array), array, expected);
+
+  int *found = arr_bsearch(array, &(int){3}, int_compare);
+  assert_not_null(found);
+  assert_int(*found, ==, 3);
+
+  int *not_found = arr_bsearch(array, &(int){7}, int_compare);
+  assert_null(not_found);
+
+  return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
   {"/initialization", test_initialization, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/array_parameter", test_array_parameter, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/safe_access", test_safe_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/qsort_bsearch", test_qsort_bsearch, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
 
