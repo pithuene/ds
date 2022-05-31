@@ -1,5 +1,7 @@
 #include "map.h"
 #include <assert.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* NOT EXPOSED */
 
@@ -212,7 +214,6 @@ void *__ds_map_reserve_internal(void *old_map, size_t new_entry_count, size_t va
   };
 
   uint8_t *old_ft_bitmap = ft_bitmap_from_header(old_header);
-  uint8_t *new_ft_bitmap = ft_bitmap_from_header(new_header);
 
   void *old_keys = keys_from_header(old_header);
 
