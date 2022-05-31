@@ -1,10 +1,10 @@
 CFLAGS_DEBUG = -g -fprofile-arcs -ftest-coverage
 CFLAGS = -std=c99 -pedantic -Wall -Wno-override-init-side-effects -Wno-unused-function -Werror $(CFLAGS_DEBUG)
 
-IMPL_SRCS = ./vec/vec.c ./mem/pool/pool.c
+IMPL_SRCS = ./vec/vec.c ./mem/pool/pool.c ./map/map.c
 IMPL_OBJS = $(patsubst ./%.c,./%.o,$(IMPL_SRCS))
 
-TEST_SRCS = ./test/test_arr.c ./test/test_vec.c ./test/test_mem_pool.c
+TEST_SRCS = ./test/test_arr.c ./test/test_vec.c ./test/test_map.c ./test/test_mem_pool.c
 TEST_OBJS = $(patsubst ./%.c,./%.o,$(TEST_SRCS))
 
 libds.a: $(IMPL_OBJS)
@@ -46,3 +46,6 @@ clean: clean-coverage
 	find . -name '*.o' -delete;
 	rm -f ./test/test
 	rm -f ./libds.a
+
+.PHONY: run
+run: test

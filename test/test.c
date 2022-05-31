@@ -2,12 +2,14 @@
 
 extern const MunitSuite arr_test_suite;
 extern const MunitSuite vec_test_suite;
+extern const MunitSuite map_test_suite;
 extern const MunitSuite mem_pool_test_suite;
 
 int main (int argc, const char* argv[]) {
   MunitSuite suites[] = {
     arr_test_suite,
     vec_test_suite,
+    map_test_suite,
     mem_pool_test_suite,
     { NULL, NULL, NULL, 0, MUNIT_SUITE_OPTION_NONE }
   };
