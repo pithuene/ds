@@ -48,10 +48,25 @@ static MunitResult test_ft_bitmap(const MunitParameter params[], void* user_data
   ft_set_tombstone(bitmap, 7, false);
   assert(!ft_has_tombstone(bitmap, 7));
 
-  // Idempotent
+  // Idempotent set tombstone true
   ft_set_tombstone(bitmap, 5, true);
   ft_set_tombstone(bitmap, 5, true);
   assert(ft_has_tombstone(bitmap, 5));
+
+  // Idempotent set tombstone false
+  ft_set_tombstone(bitmap, 5, false);
+  ft_set_tombstone(bitmap, 5, false);
+  assert(!ft_has_tombstone(bitmap, 5));
+
+  // Idempotent set full true
+  ft_set_full(bitmap, 5, true);
+  ft_set_full(bitmap, 5, true);
+  assert(ft_is_full(bitmap, 5));
+
+  // Idempotent set full false
+  ft_set_full(bitmap, 5, false);
+  ft_set_full(bitmap, 5, false);
+  assert(!ft_is_full(bitmap, 5));
 
   return MUNIT_OK;
 }
@@ -73,42 +88,58 @@ bool intequals(int *a, int *b) {
 }
 
 static MunitResult test_map(const MunitParameter params[], void* user_data_or_fixture) {
-  map_t(int, int) map = map_create(int, int, 5, (ds_map_hash_func_t *) inthash, (ds_map_equals_func_t *) intequals);
+  map_t(int, int) map = map_create(int, int, 5, (ds_map_hash_func_t *) NULL, (ds_map_equals_func_t *) NULL);
 
-  {
-    int key = 5;
-    map_put(map, &key, 1234);
-    assert_uint32(map_cap(map), ==, 8);
-    map_reserve(map, 10);
-    assert_uint32(map_cap(map), ==, 16);
+  int key = 5;
+  map_put(map, &key, 1234);
+  assert_uint32(map_cap(map), ==, 8);
+  map_reserve(map, 10);
+  assert_uint32(map_cap(map), ==, 16);
 
-    assert(map_has(map, &key));
-    key = 6;
-    assert(!map_has(map, &key));
+  assert(map_has(map, &key));
+  key = 6;
+  assert(!map_has(map, &key));
 
-    key = 5;
-    assert_int(map_get(map, &key), ==, 1234);
+  key = 5;
+  assert_int(map_get(map, &key), ==, 1234);
 
-    map_remove(map, &key);
-    assert(!map_has(map, &key));
-    map_put(map, &key, 1234);
-    assert(map_has(map, &key));
-    assert_int(map_get(map, &key), ==, 1234);
+  assert(map_remove(map, &key));
+  assert(!map_remove(map, &key));
+  assert(!map_has(map, &key));
+  map_put(map, &key, 1234);
+  assert(map_has(map, &key));
+  assert_int(map_get(map, &key), ==, 1234);
+
+  for (int i = 0; i < 98000; i++) {
+    int key = i * i;
+    map_put(map, &key, i*i);
   }
 
-  {
-    for (int i = 0; i < 98000; i++) {
-      int key = i * i;
-      map_put(map, &key, i*i);
-    }
-
-    for (int i = 0; i < 98000; i++) {
-      int key = i * i;
-      assert(map_has(map, &key));
-      int value = map_get(map, &key);
-      assert_int(value, ==, i*i);
-    }
+  for (int i = 0; i < 98000; i++) {
+    int key = i * i;
+    assert(map_has(map, &key));
+    int value = map_get(map, &key);
+    assert_int(value, ==, i*i);
   }
+
+  map_free(map);
+
+  return MUNIT_OK;
+}
+
+static MunitResult test_small_map(const MunitParameter params[], void* user_data_or_fixture) {
+  map_t(int, int) map = map_create(int, int, 1, (ds_map_hash_func_t *) inthash, (ds_map_equals_func_t *) intequals);
+
+  assert_uint32(map_cap(map), ==, 1);
+  size_t map_capacity = map_cap(map);
+  
+  // Make sure the map doesn't grow
+  map_put(map, &(int){0}, 0);
+  assert_uint32(map_cap(map), ==, map_capacity);
+
+  // Make sure the map does grow after another put
+  map_put(map, &(int){1}, 1);
+  assert_uint32(map_cap(map), >, map_capacity);
 
   map_free(map);
 
@@ -120,6 +151,7 @@ static MunitTest tests[] = {
   {"/ft_bitmap", test_ft_bitmap, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/next_pow_2", test_next_pow_2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/map", test_map, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/small_map", test_small_map, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 };
 

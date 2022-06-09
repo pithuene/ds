@@ -129,6 +129,20 @@ static inline uint32_t capacity_for_entry_count(uint32_t entry_count) {
   return next_pow_2;
 }
 
+static uint64_t map_hash_default(void *key, size_t key_len) {
+  uint8_t *input = key;
+  uint64_t hash = 5381;
+  for (size_t i = 0; i < key_len; i++) {
+    uint64_t c = *input++;
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+  }
+  return hash;
+}
+
+bool map_equals_default(void *key_a, void *key_b, size_t key_len) {
+  return memcmp(key_a, key_b, key_len) == 0;
+}
+
 /* INTERNAL */
 
 void *__ds_map_create_internal(
@@ -152,8 +166,8 @@ void *__ds_map_create_internal(
     .cap = bucket_count,
     .tombstone_count = 0,
     .key_len = key_len,
-    .hash_func = hash_func,
-    .equals_func = equals_func,
+    .hash_func = (hash_func) ? hash_func : map_hash_default,
+    .equals_func = (equals_func) ? equals_func : map_equals_default,
   };
 
   return map;
@@ -169,9 +183,9 @@ uint32_t __ds_map_alloc_bucket(void *map, void *key, size_t val_len) {
   void *keys = keys_from_header(header);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
-  uint32_t bucket_index = (*header->hash_func)(key) % header->cap;
+  uint32_t bucket_index = (*header->hash_func)(key, header->key_len) % header->cap;
   while (ft_is_full(ft_bitmap, bucket_index)
-    && !(*header->equals_func)(get_key(keys, header->key_len, bucket_index), key)
+    && !(*header->equals_func)(get_key(keys, header->key_len, bucket_index), key, header->key_len)
   ) {
     // Linear probing
     bucket_index++;
@@ -239,9 +253,9 @@ uint32_t __ds_map_get_internal(void *map, void *key, size_t val_len) {
   void *keys = keys_from_header(header);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
-  uint32_t bucket_index = (*header->hash_func)(key) % header->cap;
+  uint32_t bucket_index = (*header->hash_func)(key, header->key_len) % header->cap;
   while (ft_has_tombstone(ft_bitmap, bucket_index)
-    || (ft_is_full(ft_bitmap, bucket_index) && !(*header->equals_func)(get_key(keys, header->key_len, bucket_index), key)
+    || (ft_is_full(ft_bitmap, bucket_index) && !(*header->equals_func)(get_key(keys, header->key_len, bucket_index), key, header->key_len)
   )) {
     // Linear probing
     bucket_index++;

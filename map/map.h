@@ -19,9 +19,8 @@
   #define map_free    ds_map_free
 #endif /* DS_NO_SHORT_NAMES */
 
-// TODO: Also give key size as an argument?
-typedef uint64_t (ds_map_hash_func_t)(void *key);
-typedef bool (ds_map_equals_func_t)(void *a, void *b);
+typedef uint64_t (ds_map_hash_func_t)(void *key, size_t key_len);
+typedef bool (ds_map_equals_func_t)(void *key_a, void *key_b, size_t key_len);
 
 /* INTERNAL */
 
