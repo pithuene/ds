@@ -67,11 +67,11 @@ void ds_map_free(void *map);
   (__ds_map_create_internal(sizeof(KEY_TYPE), sizeof(VALUE_TYPE), CAP, HASH_FUNC, EQUALS_FUNC))
 #define ds_map_reserve(MAP, NEWCAP) \
   ((MAP) = __ds_map_reserve_internal(MAP, NEWCAP, sizeof(*MAP)))
-#define ds_map_put(MAP, KEY, VALUE) ( \
+#define ds_map_put(MAP, KEY, ...) ( \
   ds_map_reserve(MAP, ds_map_size(MAP) + 1), \
-  (MAP)[__ds_map_alloc_bucket(MAP, KEY, sizeof(*(MAP)))] = (VALUE) \
+  (MAP)[__ds_map_alloc_bucket(MAP, KEY, sizeof(*(MAP)))] = (__VA_ARGS__) \
 )
-#define ds_map_has(MAP, KEY) (__ds_map_get_internal(MAP, KEY, sizeof(*MAP)) != __ds_map_null_index)
+#define ds_map_has(MAP, ...) (__ds_map_get_internal(MAP, __VA_ARGS__, sizeof(*MAP)) != __ds_map_null_index)
 #define ds_map_get(MAP, KEY) ((MAP)[__ds_map_get_internal(MAP, KEY, sizeof(*MAP))])
 #define ds_map_remove(MAP, KEY) (__ds_map_remove_internal(MAP, KEY, sizeof(*MAP)))
 
