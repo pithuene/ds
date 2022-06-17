@@ -1,5 +1,6 @@
 CFLAGS_DEBUG = -g -fprofile-arcs -ftest-coverage
-CFLAGS = -std=c99 -pedantic -Wall -Wno-override-init-side-effects -Wno-unused-function -Werror $(CFLAGS_DEBUG)
+CFLAGS_RELEASE = -O3 -DNDEBUG
+CFLAGS = -std=c99 -pedantic -Wall -Wno-override-init-side-effects -Wno-unused-function -Werror
 
 IMPL_SRCS = ./vec/vec.c ./mem/pool/pool.c ./map/map.c ./set/set.c
 IMPL_OBJS = $(patsubst ./%.c,./%.o,$(IMPL_SRCS))
@@ -11,13 +12,13 @@ libds.a: $(IMPL_OBJS)
 	ar -rc libds.a $(IMPL_OBJS)
 
 $(IMPL_OBJS): ./%.o: ./%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_RELEASE) -c -o $@ $<
 
 $(TEST_OBJS): test/%.o: test/%.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) $(CFLAGS_DEBUG) -c -o $@ $<
 
 test/test: $(TEST_SRCS) $(IMPL_SRCS) clean-coverage
-	$(CC) $(CFLAGS_DEBUG) -o test/test test/test.c $(TEST_SRCS) test/munit/munit.c -lm
+	$(CC) $(CFLAGS) $(CFLAGS_DEBUG) -o test/test test/test.c $(TEST_SRCS) test/munit/munit.c -lm
 
 .PHONY: test
 test: test/test
