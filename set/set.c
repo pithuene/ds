@@ -105,7 +105,7 @@ static inline uint32_t capacity_for_entry_count(uint32_t entry_count) {
   return next_pow_2;
 }
 
-static uint64_t set_hash_default(void *value, size_t val_len) {
+static uint64_t ds_set_hash_default(void *value, size_t val_len) {
   uint8_t *input = value;
   uint64_t hash = 5381;
   for (size_t i = 0; i < val_len; i++) {
@@ -115,7 +115,7 @@ static uint64_t set_hash_default(void *value, size_t val_len) {
   return hash;
 }
 
-bool set_equals_default(void *value_a, void *value_b, size_t val_len) {
+bool ds_set_equals_default(void *value_a, void *value_b, size_t val_len) {
   return memcmp(value_a, value_b, val_len) == 0;
 }
 
@@ -140,8 +140,8 @@ void *__ds_set_create_internal(
     .size = 0,
     .cap = bucket_count,
     .tombstone_count = 0,
-    .hash_func = (hash_func) ? hash_func : set_hash_default,
-    .equals_func = (equals_func) ? equals_func : set_equals_default,
+    .hash_func = (hash_func) ? hash_func : ds_set_hash_default,
+    .equals_func = (equals_func) ? equals_func : ds_set_equals_default,
   };
 
   return set;

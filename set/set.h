@@ -7,16 +7,18 @@
 #include <limits.h>
 
 #ifndef DS_NO_SHORT_NAMES
-  #define set_t       ds_set_t
-  #define set_create  ds_set_create
-  #define set_reserve ds_set_reserve
-  #define set_cap     ds_set_cap
-  #define set_size    ds_set_size
-  #define set_add     ds_set_add
-  #define set_has     ds_set_has
-  #define set_get     ds_set_get
-  #define set_remove  ds_set_remove
-  #define set_free    ds_set_free
+  #define set_t              ds_set_t
+  #define set_create         ds_set_create
+  #define set_reserve        ds_set_reserve
+  #define set_cap            ds_set_cap
+  #define set_size           ds_set_size
+  #define set_add            ds_set_add
+  #define set_has            ds_set_has
+  #define set_get            ds_set_get
+  #define set_remove         ds_set_remove
+  #define set_free           ds_set_free
+  #define set_hash_default   ds_set_hash_default
+  #define set_equals_default ds_set_equals_default
 #endif /* DS_NO_SHORT_NAMES */
 
 typedef uint64_t (ds_set_hash_func_t)(void *key, size_t key_len);

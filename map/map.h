@@ -7,16 +7,18 @@
 #include <limits.h>
 
 #ifndef DS_NO_SHORT_NAMES
-  #define map_t       ds_map_t
-  #define map_create  ds_map_create
-  #define map_reserve ds_map_reserve
-  #define map_cap     ds_map_cap
-  #define map_size    ds_map_size
-  #define map_put     ds_map_put
-  #define map_has     ds_map_has
-  #define map_get     ds_map_get
-  #define map_remove  ds_map_remove
-  #define map_free    ds_map_free
+  #define map_t              ds_map_t
+  #define map_create         ds_map_create
+  #define map_reserve        ds_map_reserve
+  #define map_cap            ds_map_cap
+  #define map_size           ds_map_size
+  #define map_put            ds_map_put
+  #define map_has            ds_map_has
+  #define map_get            ds_map_get
+  #define map_remove         ds_map_remove
+  #define map_free           ds_map_free
+  #define map_hash_default   ds_map_hash_default
+  #define map_equals_default ds_map_equals_default
 #endif /* DS_NO_SHORT_NAMES */
 
 typedef uint64_t (ds_map_hash_func_t)(void *key, size_t key_len);

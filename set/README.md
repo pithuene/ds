@@ -25,7 +25,7 @@ set_add(my_set, (MyStruct){.a = 1, .b = 2});
 
 Check whether a certain element is in the set.
 ``` c
-if (set_contains(my_set, (MyStruct){.a = 1, .b = 2})) { ... }
+if (set_has(my_set, (MyStruct){.a = 1, .b = 2})) { ... }
 ```
 
 Remove an element from the set.
