@@ -9,7 +9,7 @@
 // Calculate the byte size of the filled / tombstone bitmap
 // The size is rounded up to a multiple of 8 bytes to avoid alignment issues.
 static inline size_t calculate_ft_bitmap_size(size_t bucket_count) {
-  size_t bits = 2 * bucket_count; // 2 bits per bucket
+  size_t bits = 2 * bucket_count;  // 2 bits per bucket
   if (bits % 64 != 0) {
     // Round up to 8 byte multiple
     // 8byte = 64bit
@@ -35,7 +35,9 @@ static inline bool ft_has_tombstone(uint8_t *ft_bitmap, uint32_t bucket_index) {
   return is_full;
 }
 
-static inline void ft_set_full(uint8_t *ft_bitmap, uint32_t bucket_index, bool full) {
+static inline void ft_set_full(
+  uint8_t *ft_bitmap, uint32_t bucket_index, bool full
+) {
   const uint32_t byte_index = bucket_index / 4;
   const uint32_t bit_offset = (bucket_index % 4) * 2;
   uint8_t mask = (0x80 >> bit_offset);
@@ -46,7 +48,9 @@ static inline void ft_set_full(uint8_t *ft_bitmap, uint32_t bucket_index, bool f
   }
 }
 
-static inline void ft_set_tombstone(uint8_t *ft_bitmap, uint32_t bucket_index, bool tombstone) {
+static inline void ft_set_tombstone(
+  uint8_t *ft_bitmap, uint32_t bucket_index, bool tombstone
+) {
   const uint32_t byte_index = bucket_index / 4;
   const uint32_t bit_offset = (bucket_index % 4) * 2 + 1;
   uint8_t mask = (0x80 >> bit_offset);
@@ -59,8 +63,7 @@ static inline void ft_set_tombstone(uint8_t *ft_bitmap, uint32_t bucket_index, b
 
 // Calculates the size of the memory block of a set of bucket_count entries
 static inline size_t calculate_mem_len(size_t bucket_count, size_t val_len) {
-  return calculate_ft_bitmap_size(bucket_count)
-       + sizeof(__ds_set_header_t)
+  return calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_set_header_t)
        + (val_len + 1) * bucket_count;
 }
 
@@ -70,18 +73,22 @@ static inline __ds_set_header_t *header_from_set(void *set) {
 }
 
 // Add the size of the ft_bitmap and the set header to the pointer
-static inline void *set_from_ft_bitmap(uint8_t *ft_bitmap, size_t bucket_count) {
-  return (void *) (((char *) ft_bitmap)
-    + calculate_ft_bitmap_size(bucket_count)
-    + sizeof(__ds_set_header_t));
+static inline void *set_from_ft_bitmap(
+  uint8_t *ft_bitmap, size_t bucket_count
+) {
+  return (void
+            *) (((char *) ft_bitmap) + calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_set_header_t));
 }
 
 static inline uint8_t *ft_bitmap_from_header(__ds_set_header_t *header) {
-  return (uint8_t *) (((char *) header) - calculate_ft_bitmap_size(header->cap));
+  return (uint8_t
+            *) (((char *) header) - calculate_ft_bitmap_size(header->cap));
 }
 
 // Calculate the memory position of a given bucket
-static inline void *get_value(void *set, size_t val_len, uint32_t bucket_index) {
+static inline void *get_value(
+  void *set, size_t val_len, uint32_t bucket_index
+) {
   return ((char *) set) + (val_len * (bucket_index + 1));
 }
 
@@ -127,7 +134,8 @@ void *__ds_set_create_internal(
   ds_set_hash_func_t *hash_func,
   ds_set_equals_func_t *equals_func
 ) {
-  // Leave enough room, so the set is only 75% filled when the desired items are inserted.
+  // Leave enough room, so the set is only 75% filled when the desired items are
+  // inserted.
   const size_t bucket_count = capacity_for_entry_count(entry_count);
   const size_t mem_len = calculate_mem_len(bucket_count, val_len);
 
@@ -158,8 +166,8 @@ uint32_t __ds_set_alloc_bucket(void *set, void *key, size_t val_len) {
 
   uint32_t bucket_index = (*header->hash_func)(key, val_len) % header->cap;
   while (ft_is_full(ft_bitmap, bucket_index)
-    && !(*header->equals_func)(get_value(set, val_len, bucket_index), key, val_len)
-  ) {
+         && !(*header->equals_func
+         )(get_value(set, val_len, bucket_index), key, val_len)) {
     // Linear probing
     bucket_index++;
     bucket_index %= header->cap;
@@ -180,7 +188,9 @@ uint32_t __ds_set_alloc_bucket(void *set, void *key, size_t val_len) {
   return bucket_index;
 }
 
-void *__ds_set_reserve_internal(void *old_set, size_t new_entry_count, size_t val_len) {
+void *__ds_set_reserve_internal(
+  void *old_set, size_t new_entry_count, size_t val_len
+) {
   __ds_set_header_t *old_header = header_from_set(old_set);
   const size_t new_cap = capacity_for_entry_count(new_entry_count);
   if (old_header->cap >= new_cap) return old_set;
@@ -209,7 +219,7 @@ void *__ds_set_reserve_internal(void *old_set, size_t new_entry_count, size_t va
   }
 
   free(old_ft_bitmap);
-  
+
   return new_set;
 }
 
@@ -218,16 +228,18 @@ uint32_t __ds_set_get_internal(void *set, void *key, size_t val_len) {
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
   uint32_t bucket_index = (*header->hash_func)(key, val_len) % header->cap;
-  while (ft_has_tombstone(ft_bitmap, bucket_index)
-    || (ft_is_full(ft_bitmap, bucket_index) && !(*header->equals_func)(get_value(set, val_len, bucket_index), key, val_len)
-  )) {
+  while (
+    ft_has_tombstone(ft_bitmap, bucket_index)
+    || (ft_is_full(ft_bitmap, bucket_index) && !(*header->equals_func)(get_value(set, val_len, bucket_index), key, val_len))
+  ) {
     // Linear probing
     bucket_index++;
     bucket_index %= header->cap;
   }
 
-  // At this point, either a full bucket is reached, in which case it contains the correct key
-  // or an empty bucket is reached, in which case the key is not inside the set.
+  // At this point, either a full bucket is reached, in which case it contains
+  // the correct key or an empty bucket is reached, in which case the key is not
+  // inside the set.
 
   if (ft_is_full(ft_bitmap, bucket_index)) {
     // Hit
@@ -241,7 +253,7 @@ uint32_t __ds_set_get_internal(void *set, void *key, size_t val_len) {
 bool __ds_set_remove_internal(void *set, void *key, size_t val_len) {
   uint32_t bucket_index = __ds_set_get_internal(set, key, val_len);
   if (bucket_index == __ds_set_null_index) return false;
-  
+
   __ds_set_header_t *header = header_from_set(set);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
   ft_set_tombstone(ft_bitmap, bucket_index, true);
@@ -250,16 +262,11 @@ bool __ds_set_remove_internal(void *set, void *key, size_t val_len) {
 
 /* EXTERNAL */
 
-uint32_t ds_set_cap(void *set) {
-  return header_from_set(set)->cap;
-}
+uint32_t ds_set_cap(void *set) { return header_from_set(set)->cap; }
 
-uint32_t ds_set_size(void *set) {
-  return header_from_set(set)->size;
-}
+uint32_t ds_set_size(void *set) { return header_from_set(set)->size; }
 
 void ds_set_free(void *set) {
   __ds_set_header_t *header = header_from_set(set);
   free(ft_bitmap_from_header(header));
 }
-

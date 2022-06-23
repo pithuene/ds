@@ -7,7 +7,9 @@
 #include "../map/map.h"
 #include "../map/map.c"
 
-static MunitResult test_ft_bitmap_size(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_ft_bitmap_size(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
   assert_uint(calculate_ft_bitmap_size(1), ==, 8);
   assert_uint(calculate_ft_bitmap_size(32), ==, 8);
   assert_uint(calculate_ft_bitmap_size(33), ==, 16);
@@ -15,7 +17,9 @@ static MunitResult test_ft_bitmap_size(const MunitParameter params[], void* user
   return MUNIT_OK;
 }
 
-static MunitResult test_ft_bitmap(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_ft_bitmap(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
   size_t memory_length = calculate_ft_bitmap_size(32);
   uint8_t *bitmap = calloc(1, memory_length);
   // 00 00 10 00 => Bucket 2 is full
@@ -71,24 +75,26 @@ static MunitResult test_ft_bitmap(const MunitParameter params[], void* user_data
   return MUNIT_OK;
 }
 
-static MunitResult test_next_pow_2(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_next_pow_2(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
   for (uint32_t i = 0; i < 1050; i++) {
-    assert_uint32(calculate_next_pow_2(i), ==, pow(2, ceil(log(i)/log(2))));
+    assert_uint32(calculate_next_pow_2(i), ==, pow(2, ceil(log(i) / log(2))));
   }
 
   return MUNIT_OK;
 }
 
-uint64_t inthash(int *num) {
-  return *num;
-}
+uint64_t inthash(int *num) { return *num; }
 
-bool intequals(int *a, int *b) {
-  return *a == *b;
-}
+bool intequals(int *a, int *b) { return *a == *b; }
 
-static MunitResult test_map(const MunitParameter params[], void* user_data_or_fixture) {
-  map_t(int, int) map = map_create(int, int, 5, (ds_map_hash_func_t *) NULL, (ds_map_equals_func_t *) NULL);
+static MunitResult test_map(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+  map_t(int, int) map = map_create(
+    int, int, 5, (ds_map_hash_func_t *) NULL, (ds_map_equals_func_t *) NULL
+  );
 
   int key = 5;
   map_put(map, &key, 1234);
@@ -112,14 +118,14 @@ static MunitResult test_map(const MunitParameter params[], void* user_data_or_fi
 
   for (int i = 0; i < 98000; i++) {
     int key = i * i;
-    map_put(map, &key, i*i);
+    map_put(map, &key, i * i);
   }
 
   for (int i = 0; i < 98000; i++) {
     int key = i * i;
     assert(map_has(map, &key));
     int value = map_get(map, &key);
-    assert_int(value, ==, i*i);
+    assert_int(value, ==, i * i);
   }
 
   map_free(map);
@@ -127,12 +133,20 @@ static MunitResult test_map(const MunitParameter params[], void* user_data_or_fi
   return MUNIT_OK;
 }
 
-static MunitResult test_small_map(const MunitParameter params[], void* user_data_or_fixture) {
-  map_t(int, int) map = map_create(int, int, 1, (ds_map_hash_func_t *) inthash, (ds_map_equals_func_t *) intequals);
+static MunitResult test_small_map(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+  map_t(int, int) map = map_create(
+    int,
+    int,
+    1,
+    (ds_map_hash_func_t *) inthash,
+    (ds_map_equals_func_t *) intequals
+  );
 
   assert_uint32(map_cap(map), ==, 1);
   size_t map_capacity = map_cap(map);
-  
+
   // Make sure the map doesn't grow
   map_put(map, &(int){0}, 0);
   assert_uint32(map_cap(map), ==, map_capacity);
@@ -147,13 +161,17 @@ static MunitResult test_small_map(const MunitParameter params[], void* user_data
 }
 
 static MunitTest tests[] = {
-  {"/ft_bitmap_size", test_ft_bitmap_size, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/ft_bitmap_size",
+   test_ft_bitmap_size,
+   NULL,
+   NULL,
+   MUNIT_TEST_OPTION_NONE,
+   NULL},
   {"/ft_bitmap", test_ft_bitmap, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/next_pow_2", test_next_pow_2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/map", test_map, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/small_map", test_small_map, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-  {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
-};
+  {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
-const MunitSuite map_test_suite = {"/map", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE};
-
+const MunitSuite map_test_suite = {
+  "/map", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE};

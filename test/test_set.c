@@ -13,14 +13,16 @@ typedef struct {
 } Struct;
 
 uint64_t struct_hash_function(void *key, size_t size) {
-  return ((Struct *)key)->key;
+  return ((Struct *) key)->key;
 }
 
 bool struct_compare_function(void *key1, void *key2, size_t size) {
-  return ((Struct *)key1)->key == ((Struct *)key2)->key;
+  return ((Struct *) key1)->key == ((Struct *) key2)->key;
 }
 
-static MunitResult test_add_remove(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_add_remove(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
   set_t(Struct) set = set_create(Struct, 5, NULL, NULL);
   Struct new_element = {.key = 1, .value = "test"};
   set_add(set, new_element);
@@ -46,8 +48,7 @@ static MunitResult test_add_remove(const MunitParameter params[], void* user_dat
 
 static MunitTest tests[] = {
   {"/add_remove", test_add_remove, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-  {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
-};
+  {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
-const MunitSuite set_test_suite = {"/set", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE};
-
+const MunitSuite set_test_suite = {
+  "/set", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE};

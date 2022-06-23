@@ -7,22 +7,22 @@
 #include <limits.h>
 
 #ifndef DS_NO_SHORT_NAMES
-  #define map_t              ds_map_t
-  #define map_create         ds_map_create
-  #define map_reserve        ds_map_reserve
-  #define map_cap            ds_map_cap
-  #define map_size           ds_map_size
-  #define map_put            ds_map_put
-  #define map_has            ds_map_has
-  #define map_get            ds_map_get
-  #define map_remove         ds_map_remove
-  #define map_free           ds_map_free
-  #define map_hash_default   ds_map_hash_default
-  #define map_equals_default ds_map_equals_default
+#define map_t              ds_map_t
+#define map_create         ds_map_create
+#define map_reserve        ds_map_reserve
+#define map_cap            ds_map_cap
+#define map_size           ds_map_size
+#define map_put            ds_map_put
+#define map_has            ds_map_has
+#define map_get            ds_map_get
+#define map_remove         ds_map_remove
+#define map_free           ds_map_free
+#define map_hash_default   ds_map_hash_default
+#define map_equals_default ds_map_equals_default
 #endif /* DS_NO_SHORT_NAMES */
 
-typedef uint64_t (ds_map_hash_func_t)(void *key, size_t key_len);
-typedef bool (ds_map_equals_func_t)(void *key_a, void *key_b, size_t key_len);
+typedef uint64_t(ds_map_hash_func_t)(void *key, size_t key_len);
+typedef bool(ds_map_equals_func_t)(void *key_a, void *key_b, size_t key_len);
 
 /* INTERNAL */
 
@@ -66,15 +66,19 @@ void ds_map_free(void *map);
 // but listed for readability of the calling code.
 #define ds_map_t(KEY_TYPE, VALUE_TYPE) VALUE_TYPE *
 #define ds_map_create(KEY_TYPE, VALUE_TYPE, CAP, HASH_FUNC, EQUALS_FUNC) \
-  (__ds_map_create_internal(sizeof(KEY_TYPE), sizeof(VALUE_TYPE), CAP, HASH_FUNC, EQUALS_FUNC))
+  (__ds_map_create_internal(                                             \
+    sizeof(KEY_TYPE), sizeof(VALUE_TYPE), CAP, HASH_FUNC, EQUALS_FUNC    \
+  ))
 #define ds_map_reserve(MAP, NEWCAP) \
   ((MAP) = __ds_map_reserve_internal(MAP, NEWCAP, sizeof(*MAP)))
-#define ds_map_put(MAP, KEY, ...) ( \
-  ds_map_reserve(MAP, ds_map_size(MAP) + 1), \
-  (MAP)[__ds_map_alloc_bucket(MAP, KEY, sizeof(*(MAP)))] = (__VA_ARGS__) \
-)
-#define ds_map_has(MAP, ...) (__ds_map_get_internal(MAP, __VA_ARGS__, sizeof(*MAP)) != __ds_map_null_index)
-#define ds_map_get(MAP, KEY) ((MAP)[__ds_map_get_internal(MAP, KEY, sizeof(*MAP))])
-#define ds_map_remove(MAP, KEY) (__ds_map_remove_internal(MAP, KEY, sizeof(*MAP)))
+#define ds_map_put(MAP, KEY, ...)             \
+  (ds_map_reserve(MAP, ds_map_size(MAP) + 1), \
+   (MAP)[__ds_map_alloc_bucket(MAP, KEY, sizeof(*(MAP)))] = (__VA_ARGS__))
+#define ds_map_has(MAP, ...) \
+  (__ds_map_get_internal(MAP, __VA_ARGS__, sizeof(*MAP)) != __ds_map_null_index)
+#define ds_map_get(MAP, KEY) \
+  ((MAP)[__ds_map_get_internal(MAP, KEY, sizeof(*MAP))])
+#define ds_map_remove(MAP, KEY) \
+  (__ds_map_remove_internal(MAP, KEY, sizeof(*MAP)))
 
 #endif /* DS_MAP_H */

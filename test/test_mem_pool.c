@@ -6,8 +6,10 @@
 
 #include "../mem/pool/pool.c"
 
-static MunitResult test_pow2(const MunitParameter params[], void* user_data_or_fixture) {
-  #define TEST_POW(X) assert_int((int)(pow(2, X) + 0.5), ==, POW2(X))
+static MunitResult test_pow2(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+#define TEST_POW(X) assert_int((int) (pow(2, X) + 0.5), ==, POW2(X))
 
   for (int i = 1; i < 16; i++) {
     TEST_POW(i);
@@ -16,8 +18,10 @@ static MunitResult test_pow2(const MunitParameter params[], void* user_data_or_f
   return MUNIT_OK;
 }
 
-static MunitResult test_get_block_capacity(const MunitParameter params[], void* user_data_or_fixture) {
-  size_t expected[] = {2,4,8,16,32,64,128};
+static MunitResult test_get_block_capacity(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+  size_t expected[] = {2, 4, 8, 16, 32, 64, 128};
   for (int i = 0; i < (sizeof(expected) / sizeof(*expected)); i++) {
     assert_uint(get_block_capacity(i), ==, expected[i]);
   }
@@ -25,7 +29,9 @@ static MunitResult test_get_block_capacity(const MunitParameter params[], void* 
   return MUNIT_OK;
 }
 
-static MunitResult test_header_access(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_header_access(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
   pool_allocator_t(uint64_t) allocator = new_pool_allocator(uint64_t);
   __ds_pool_header_t *header = header_from_pool_allocator((void **) allocator);
   assert_uint(header->block_idx, ==, 0);
@@ -34,7 +40,9 @@ static MunitResult test_header_access(const MunitParameter params[], void* user_
   return MUNIT_OK;
 }
 
-static MunitResult test_freelist_is_empty(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_freelist_is_empty(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
   __ds_pool_header_t header = {
     .block_idx = 0,
     .cell_idx = 0,
@@ -50,11 +58,13 @@ static MunitResult test_freelist_is_empty(const MunitParameter params[], void* u
 
   header.block_idx = MAX_BLOCKS - 1;
   assert(freelist_is_empty(&header));
-  
+
   return MUNIT_OK;
 }
 
-static MunitResult test_is_cell_in_block(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_is_cell_in_block(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
   pool_allocator_t(uint64_t) allocator = new_pool_allocator(uint64_t);
   uint64_t *val = poolalloc(allocator);
 
@@ -65,10 +75,12 @@ static MunitResult test_is_cell_in_block(const MunitParameter params[], void* us
   return MUNIT_OK;
 }
 
-static MunitResult test_allocation(const MunitParameter params[], void* user_data_or_fixture) {
+static MunitResult test_allocation(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
   pool_allocator_t(uint64_t) palloc = new_pool_allocator(uint64_t);
 
-  #define VAL_COUNT 126
+#define VAL_COUNT 126
 
   uint64_t *vals[VAL_COUNT];
 
@@ -93,7 +105,8 @@ static MunitResult test_allocation(const MunitParameter params[], void* user_dat
     poolfree(palloc, vals[VAL_COUNT - 1]);
     // Allocate it again
     vals[VAL_COUNT - 1] = poolalloc(palloc);
-    // If the freed cell was properly reused, no new block should have been allocated.
+    // If the freed cell was properly reused, no new block should have been
+    // allocated.
     assert_uint64(header->number_of_blocks, ==, 6);
   }
 
@@ -119,22 +132,39 @@ static MunitResult test_allocation(const MunitParameter params[], void* user_dat
   // Same slot allocated
   assert_ptr_equal(another_val, another_val_again);
 
-  /* Free an invalid pointer */ {
-    assert(poolfree(palloc, NULL) == false);
-  }
+  /* Free an invalid pointer */ { assert(poolfree(palloc, NULL) == false); }
 
   return MUNIT_OK;
 }
 
 static MunitTest tests[] = {
   {"/pow2", test_pow2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-  {"/get_block_capacity", test_get_block_capacity, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-  {"/header_access", test_header_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-  {"/freelist_is_empty", test_freelist_is_empty, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-  {"/is_cell_in_block", test_is_cell_in_block, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/get_block_capacity",
+   test_get_block_capacity,
+   NULL,
+   NULL,
+   MUNIT_TEST_OPTION_NONE,
+   NULL},
+  {"/header_access",
+   test_header_access,
+   NULL,
+   NULL,
+   MUNIT_TEST_OPTION_NONE,
+   NULL},
+  {"/freelist_is_empty",
+   test_freelist_is_empty,
+   NULL,
+   NULL,
+   MUNIT_TEST_OPTION_NONE,
+   NULL},
+  {"/is_cell_in_block",
+   test_is_cell_in_block,
+   NULL,
+   NULL,
+   MUNIT_TEST_OPTION_NONE,
+   NULL},
   {"/allocation", test_allocation, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
-  {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
-};
+  {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
-const MunitSuite mem_pool_test_suite = {"/mem/pool", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE};
-
+const MunitSuite mem_pool_test_suite = {
+  "/mem/pool", tests, NULL, 1, MUNIT_SUITE_OPTION_NONE};

@@ -41,7 +41,8 @@ void *__ds_vec_reserve_internal(void *vec, size_t new_cap, size_t val_len) {
     // Capacity sufficient
     return vec;
   }
-  header = (__ds_vec_header_t *) realloc(header, vec_memory_length(new_cap, val_len));
+  header =
+    (__ds_vec_header_t *) realloc(header, vec_memory_length(new_cap, val_len));
   header->cap = new_cap;
   return vec_from_header(header);
 }
@@ -60,10 +61,6 @@ size_t __ds_vec_capacity_after_push(void *vec) {
 
 /* EXTERNAL */
 
-size_t ds_vec_len(void *vec) {
-  return __ds_vec_header(vec)->len;
-}
+size_t ds_vec_len(void *vec) { return __ds_vec_header(vec)->len; }
 
-size_t ds_vec_cap(void *vec) {
-  return __ds_vec_header(vec)->cap;
-}
+size_t ds_vec_cap(void *vec) { return __ds_vec_header(vec)->cap; }
