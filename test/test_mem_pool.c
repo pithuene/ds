@@ -32,11 +32,12 @@ static MunitResult test_get_block_capacity(
 static MunitResult test_header_access(
   const MunitParameter params[], void *user_data_or_fixture
 ) {
-  pool_allocator_t(uint64_t) allocator = new_pool_allocator(uint64_t);
+  pool_allocator_t(uint64_t) allocator = pool_allocator_create(uint64_t);
   __ds_pool_header_t *header = header_from_pool_allocator((void **) allocator);
   assert_uint(header->block_idx, ==, 0);
   void **returned_allocator = pool_allocator_from_header(header);
   assert_ptr_equal(allocator, returned_allocator);
+  pool_allocator_delete(allocator);
   return MUNIT_OK;
 }
 
@@ -65,12 +66,14 @@ static MunitResult test_freelist_is_empty(
 static MunitResult test_is_cell_in_block(
   const MunitParameter params[], void *user_data_or_fixture
 ) {
-  pool_allocator_t(uint64_t) allocator = new_pool_allocator(uint64_t);
+  pool_allocator_t(uint64_t) allocator = pool_allocator_create(uint64_t);
   uint64_t *val = poolalloc(allocator);
 
   assert(is_cell_in_block(allocator[0], 0, val, sizeof(uint64_t)));
   assert(!is_cell_in_block(allocator[0], 0, val - 1, sizeof(uint64_t)));
   assert(!is_cell_in_block(allocator[0], 0, val - 2, sizeof(uint64_t)));
+
+  pool_allocator_delete(allocator);
 
   return MUNIT_OK;
 }
@@ -78,7 +81,7 @@ static MunitResult test_is_cell_in_block(
 static MunitResult test_allocation(
   const MunitParameter params[], void *user_data_or_fixture
 ) {
-  pool_allocator_t(uint64_t) palloc = new_pool_allocator(uint64_t);
+  pool_allocator_t(uint64_t) palloc = pool_allocator_create(uint64_t);
 
 #define VAL_COUNT 126
 
@@ -133,6 +136,8 @@ static MunitResult test_allocation(
   assert_ptr_equal(another_val, another_val_again);
 
   /* Free an invalid pointer */ { assert(poolfree(palloc, NULL) == false); }
+
+  pool_allocator_delete(palloc);
 
   return MUNIT_OK;
 }

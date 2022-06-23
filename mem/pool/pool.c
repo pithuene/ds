@@ -181,7 +181,7 @@ static inline bool cell_refs_equal(
 
 /* INTERNAL */
 
-void **__ds_new_pool_allocator(size_t val_len) {
+void **__ds_pool_allocator_create(size_t val_len) {
   assert(DS_POOL_CELL_BITS + DS_POOL_BLOCK_BITS == 32);
   // Make sure there is enough space for the freelist
   assert(val_len >= sizeof(__ds_pool_cell_ref_t));
@@ -252,4 +252,15 @@ bool __ds_poolfree_internal(void **allocator, void *cell, size_t val_len) {
   __ds_pool_header_t *header = header_from_pool_allocator(allocator);
   freelist_append(header, cell_ref, cell);
   return true;
+}
+
+/* EXTERNAL */
+
+void ds_pool_allocator_delete(void *allocator_in) {
+  void **allocator = allocator_in;
+  __ds_pool_header_t *header = header_from_pool_allocator(allocator);
+  for (int i = 0; i < header->number_of_blocks; i++) {
+    free(allocator[i]);
+  }
+  free(header);
 }
