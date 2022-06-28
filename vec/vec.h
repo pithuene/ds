@@ -25,6 +25,8 @@
 
 /* INTERNAL */
 
+// TODO: If you add a function ds_vec_increment_size (probably better to add
+// ds_vec_resize and use that) the header definition can become internal
 typedef struct {
   uint64_t len : 32;
   uint64_t cap : 32;

@@ -11,7 +11,7 @@
 #define MAX_BLOCKS          POW2(DS_POOL_BLOCK_BITS)
 #define MAX_CELLS_PER_BLOCK POW2(DS_POOL_CELL_BITS)
 
-static const __ds_pool_cell_ref_t NULL_CELL_REF = {
+__ds_pool_cell_ref_t __ds_pool_NULL_CELL_REF = {
   .block_idx = MAX_BLOCKS - 1,
   .cell_idx = MAX_CELLS_PER_BLOCK - 1,
 };
@@ -158,13 +158,13 @@ static inline __ds_pool_cell_ref_t cellref_for_cell(
 ) {
   uint32_t block_idx;
   if (!find_block_for_cell(allocator, cell, val_len, &block_idx)) {
-    return NULL_CELL_REF;
+    return __ds_pool_NULL_CELL_REF;
   }
   void *block = get_allocator_block(allocator, block_idx);
   const ptrdiff_t offset_in_block = (char *) cell - (char *) block;
   if (offset_in_block % val_len != 0) {
     assert(false && "Failed to find cellref. Pointer does not reference the start of a cell.");
-    return NULL_CELL_REF;
+    return __ds_pool_NULL_CELL_REF;
   }
   uint32_t cell_idx = offset_in_block / val_len;
   return (__ds_pool_cell_ref_t){
@@ -190,8 +190,8 @@ void **__ds_pool_allocator_create(size_t val_len) {
   const size_t block_arr_mem_len = block_arr_memory_len(initial_blocks);
   __ds_pool_header_t *header = malloc(block_arr_mem_len);
   *header = (__ds_pool_header_t){
-    .block_idx = NULL_CELL_REF.block_idx,
-    .cell_idx = NULL_CELL_REF.cell_idx,
+    .block_idx = __ds_pool_NULL_CELL_REF.block_idx,
+    .cell_idx = __ds_pool_NULL_CELL_REF.cell_idx,
     .number_of_blocks = 0,
   };
   void **pool_allocator = pool_allocator_from_header(header);
@@ -245,13 +245,34 @@ uint32_t __ds_poolalloc_head_cell_idx(void **allocator, size_t val_len) {
 // Returns whether freeing was successful
 bool __ds_poolfree_internal(void **allocator, void *cell, size_t val_len) {
   __ds_pool_cell_ref_t cell_ref = cellref_for_cell(allocator, cell, val_len);
-  if (cell_refs_equal(cell_ref, NULL_CELL_REF)) {
+  if (cell_refs_equal(cell_ref, __ds_pool_NULL_CELL_REF)) {
     return false;
   }
 
   __ds_pool_header_t *header = header_from_pool_allocator(allocator);
   freelist_append(header, cell_ref, cell);
   return true;
+}
+
+void __ds_poolfree_cellref_internal(
+  void **allocator, __ds_pool_cell_ref_t cellref, void *cell
+) {
+  __ds_pool_header_t *header = header_from_pool_allocator(allocator);
+  freelist_append(header, cellref, (__ds_pool_cell_ref_t *) cell);
+}
+
+__ds_pool_cell_ref_t __ds_poolalloc_cellref_internal(
+  void **allocator, size_t val_len
+) {
+  __ds_pool_header_t *header = header_from_pool_allocator(allocator);
+  __ds_pool_cell_ref_t allocated_cell_ref = freelist_head(header);
+  void *block_with_allocated_cell = allocator[allocated_cell_ref.block_idx];
+  __ds_pool_cell_ref_t *allocated_cell =
+    (__ds_pool_cell_ref_t
+       *) (((char *) block_with_allocated_cell) + val_len * allocated_cell_ref.cell_idx);
+  header->block_idx = allocated_cell->block_idx;
+  header->cell_idx = allocated_cell->cell_idx;
+  return allocated_cell_ref;
 }
 
 /* EXTERNAL */
@@ -263,4 +284,9 @@ void ds_pool_allocator_delete(void *allocator_in) {
     free(allocator[i]);
   }
   free(header);
+}
+
+__ds_pool_cell_ref_t ds_pool_allocator_freelist_head(void *allocator) {
+  __ds_pool_header_t *header = header_from_pool_allocator(allocator);
+  return freelist_head(header);
 }

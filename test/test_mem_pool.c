@@ -142,6 +142,51 @@ static MunitResult test_allocation(
   return MUNIT_OK;
 }
 
+static MunitResult test_cellref_api(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+  pool_allocator_t(uint64_t) palloc = pool_allocator_create(uint64_t);
+
+  __ds_pool_cell_ref_t ref = poolalloc_cellref(palloc);
+  assert_uint32(ref.block_idx, ==, 0);
+  assert_uint32(ref.cell_idx, ==, 0);
+
+  __ds_pool_header_t *header = header_from_pool_allocator((void **) palloc);
+  assert_uint32(header->block_idx, ==, 0);
+  assert_uint32(header->cell_idx, ==, 1);
+
+  palloc[ref.block_idx][ref.cell_idx] = 1234;
+  uint64_t *cell = &palloc[ref.block_idx][ref.cell_idx];
+
+  poolfree_cellref(palloc, ref);
+
+  assert_uint32(header->block_idx, ==, 0);
+  assert_uint32(header->cell_idx, ==, 0);
+  assert_uint32(header->number_of_blocks, ==, 1);
+
+  uint64_t *allocated_normally = poolalloc(palloc);
+  assert_ptr_equal(cell, allocated_normally);
+  __ds_pool_cell_ref_t found_cellref = cellref_for_cell(
+    (void **) palloc, allocated_normally, sizeof(*allocated_normally)
+  );
+  assert_uint32(found_cellref.block_idx, ==, 0);
+  assert_uint32(found_cellref.cell_idx, ==, 0);
+
+  assert_uint32(header->block_idx, ==, 0);
+  assert_uint32(header->cell_idx, ==, 1);
+  assert_uint32(header->number_of_blocks, ==, 1);
+
+  *allocated_normally = 123;
+  assert_uint64(
+    palloc[found_cellref.block_idx][found_cellref.cell_idx], ==, 123
+  );
+  assert_uint64(*allocated_normally, ==, 123);
+
+  poolfree(palloc, allocated_normally);
+
+  return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
   {"/pow2", test_pow2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/get_block_capacity",
@@ -169,6 +214,7 @@ static MunitTest tests[] = {
    MUNIT_TEST_OPTION_NONE,
    NULL},
   {"/allocation", test_allocation, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/cellref_api", test_cellref_api, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
 const MunitSuite mem_pool_test_suite = {
