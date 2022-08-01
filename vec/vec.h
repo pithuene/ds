@@ -56,6 +56,7 @@ size_t __ds_vec_capacity_after_push(void *vec);
 // Allocate a new vector with a given initial capacity
 #define ds_vec_create(TYPE, CAP) \
   ((ds_vec_t(TYPE)) __ds_vec_create(sizeof(TYPE), CAP))
+void ds_vec_free(void *vec_items);
 #define ds_vec_reserve(VEC, NEWCAP) \
   ((VEC) = __ds_vec_reserve_internal(VEC, NEWCAP, sizeof(*VEC)))
 #define ds_vec_get(VEC, IDX) \

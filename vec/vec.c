@@ -50,3 +50,10 @@ size_t __ds_vec_capacity_after_push(void *vec_items) {
     return vec->header.cap * 2;
   }
 }
+
+/* EXTERNAL */
+
+void ds_vec_free(void *vec_items) {
+  __ds_vec_struct_t *vec = ds_container_of(vec_items, __ds_vec_struct_t, items);
+  free(vec);
+}
