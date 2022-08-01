@@ -8,10 +8,14 @@ static MunitResult test_header_access(
   const MunitParameter params[], void *user_data_or_fixture
 ) {
   vec_t(uint64_t) vector = vec_create(uint64_t, 10);
-  __ds_vec_header_t *header = __ds_vec_header(vector);
+  __ds_vec_struct_t *vec_struct =
+    ds_container_of(vector, __ds_vec_struct_t, items);
+
   assert_uint(vec_len(vector), ==, 0);
   assert_uint(vec_cap(vector), ==, 10);
-  void *returned_vector = vec_from_header(header);
+
+  void *returned_vector = &vec_struct->items;
+
   assert_ptr_equal(vector, returned_vector);
   return MUNIT_OK;
 }
