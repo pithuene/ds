@@ -12,6 +12,8 @@ Datastructures
 - [`map_t(K, V)`](./map/README.md) — A hash map with typesafe values
 - [`pool_allocator_t(T)`](./mem/pool/README.md) — A generic memory pool
 
+There are also various utilities in [/util](./util/README.md).
+
 Design and alternatives
 -----------------------
 

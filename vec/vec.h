@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#include "../util.h"
+#include "../util/container_of.h"
 
 #ifndef DS_NO_SHORT_NAMES
 #define vec_t       ds_vec_t

@@ -6,7 +6,7 @@ IMPL_HEADERS = ./arr/arr.h ./vec/vec.h ./mem/pool/pool.h ./map/map.h ./set/set.h
 IMPL_SRCS = ./vec/vec.c ./mem/pool/pool.c ./map/map.c ./set/set.c
 IMPL_OBJS = $(patsubst ./%.c,./%.o,$(IMPL_SRCS))
 
-TEST_SRCS = ./test/test_arr.c ./test/test_vec.c ./test/test_map.c ./test/test_mem_pool.c ./test/test_set.c
+TEST_SRCS = ./test/test_arr.c ./test/test_vec.c ./test/test_map.c ./test/test_mem_pool.c ./test/test_set.c ./test/test_util.c
 TEST_OBJS = $(patsubst ./%.c,./%.o,$(TEST_SRCS))
 
 libds.a: $(IMPL_OBJS)
