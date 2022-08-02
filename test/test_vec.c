@@ -91,6 +91,24 @@ static MunitResult test_push(
   return MUNIT_OK;
 }
 
+static MunitResult test_push_malloc_regression(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+  vec_t(int) vec = vec_create(int, 10);
+
+  for (int i = 0; i < 12; i++) {
+    vec_push(vec, i);
+  }
+
+  assert(vec_cap(vec) == 20);
+  assert(vec_len(vec) == 12);
+
+  // Up to 12 items were fine, but pushing a 13th item caused some sort of
+  // memory corruption
+  vec_push(vec, 1234);
+  return MUNIT_OK;
+}
+
 static MunitResult test_safe_access(
   const MunitParameter params[], void *user_data_or_fixture
 ) {
@@ -152,6 +170,12 @@ static MunitTest tests[] = {
    NULL},
   {"/reserve", test_reserve, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/push", test_push, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/push_malloc_regression",
+   test_push_malloc_regression,
+   NULL,
+   NULL,
+   MUNIT_TEST_OPTION_NONE,
+   NULL},
   {"/empty_vec", test_empty_vec, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/safe_access", test_safe_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/qsort_bsearch",

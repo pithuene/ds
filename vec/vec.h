@@ -63,8 +63,8 @@ void ds_vec_free(void *vec_items);
   (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX])
 #define ds_vec_set(VEC, IDX, VAL) \
   (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX] = (VAL))
-#define ds_vec_push(VEC, VAL)                                                \
-  (ds_vec_reserve(VEC, ds_vec_cap(VEC) = __ds_vec_capacity_after_push(VEC)), \
+#define ds_vec_push(VEC, VAL)                              \
+  (ds_vec_reserve(VEC, __ds_vec_capacity_after_push(VEC)), \
    (VEC)[ds_vec_len(VEC)++] = (VAL))
 #define ds_vec_qsort(VEC, COMPAR_FN) \
   qsort(VEC, ds_vec_len(VEC), sizeof(*(VEC)), (__compar_fn_t) (COMPAR_FN))
