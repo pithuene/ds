@@ -109,6 +109,25 @@ static MunitResult test_push_malloc_regression(
   return MUNIT_OK;
 }
 
+static MunitResult test_pop(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+  vec_t(int) vector = vec_create(int, 10);
+
+  for (int i = 0; i < 100; i++) {
+    vec_push(vector, i * i);
+  }
+
+  assert_uint(vec_len(vector), ==, 100);
+  assert_uint(vec_cap(vector), ==, 160);
+
+  for (int i = 99; i >= 99; i--) {
+    assert_int(vec_pop(vector), ==, i * i);
+  }
+
+  return MUNIT_OK;
+}
+
 static MunitResult test_safe_access(
   const MunitParameter params[], void *user_data_or_fixture
 ) {
@@ -176,6 +195,7 @@ static MunitTest tests[] = {
    NULL,
    MUNIT_TEST_OPTION_NONE,
    NULL},
+  {"/pop", test_pop, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/empty_vec", test_empty_vec, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/safe_access", test_safe_access, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/qsort_bsearch",

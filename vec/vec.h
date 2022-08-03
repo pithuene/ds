@@ -53,21 +53,31 @@ size_t __ds_vec_capacity_after_push(void *vec);
   (ds_container_of(VEC, __ds_vec_struct_t, items)->header.cap)
 
 #define ds_vec_t(TYPE) TYPE *
+
 // Allocate a new vector with a given initial capacity
 #define ds_vec_create(TYPE, CAP) \
   ((ds_vec_t(TYPE)) __ds_vec_create(sizeof(TYPE), CAP))
+
 void ds_vec_free(void *vec_items);
+
 #define ds_vec_reserve(VEC, NEWCAP) \
   ((VEC) = __ds_vec_reserve_internal(VEC, NEWCAP, sizeof(*VEC)))
+
 #define ds_vec_get(VEC, IDX) \
   (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX])
+
 #define ds_vec_set(VEC, IDX, VAL) \
   (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX] = (VAL))
+
 #define ds_vec_push(VEC, VAL)                              \
   (ds_vec_reserve(VEC, __ds_vec_capacity_after_push(VEC)), \
    (VEC)[ds_vec_len(VEC)++] = (VAL))
+
+#define ds_vec_pop(VEC) (assert(1), (VEC)[--ds_vec_len(VEC)])
+
 #define ds_vec_qsort(VEC, COMPAR_FN) \
   qsort(VEC, ds_vec_len(VEC), sizeof(*(VEC)), (__compar_fn_t) (COMPAR_FN))
+
 #define ds_vec_bsearch(VEC, KEY, COMPAR_FN) \
   bsearch(KEY, VEC, ds_vec_len(VEC), sizeof(*(VEC)), (__compar_fn_t) COMPAR_FN)
 
