@@ -69,9 +69,9 @@ void ds_vec_free(void *vec_items);
 #define ds_vec_set(VEC, IDX, VAL) \
   (assert(IDX >= 0), assert(IDX < ds_vec_len(VEC)), (VEC)[IDX] = (VAL))
 
-#define ds_vec_push(VEC, VAL)                              \
+#define ds_vec_push(VEC, ...)                              \
   (ds_vec_reserve(VEC, __ds_vec_capacity_after_push(VEC)), \
-   (VEC)[ds_vec_len(VEC)++] = (VAL))
+   (VEC)[ds_vec_len(VEC)++] = (__VA_ARGS__))
 
 #define ds_vec_pop(VEC) (assert(1), (VEC)[--ds_vec_len(VEC)])
 
