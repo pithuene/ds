@@ -54,7 +54,7 @@ uint32_t __ds_map_alloc_bucket(void *map, void *key, size_t val_len);
 uint32_t __ds_map_get_internal(void *map, void *key, size_t val_len);
 bool __ds_map_remove_internal(void *map, void *key, size_t val_len);
 
-const uint32_t __ds_map_null_index = UINT32_MAX;
+extern const uint32_t __ds_map_null_index;
 
 /* EXTERNAL */
 

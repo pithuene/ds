@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -6,6 +7,8 @@
 #include "munit/munit.h"
 #include "../set/set.h"
 #include "../set/set.c"
+
+#include "../vec/vec.h"
 
 typedef struct {
   int key;
@@ -46,8 +49,57 @@ static MunitResult test_add_remove(
   return MUNIT_OK;
 }
 
+int int_compare(const void *a, const void *b) {
+  return *((int *) a) - *((int *) b);
+}
+
+static MunitResult test_foreach(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+#define MAX_CHECKED 100
+
+  set_t(int) set = set_create(int, 20, NULL, NULL);
+  vec_t(int) entries_vec = vec_create(int, 20);
+
+  for (int i = 0; i < MAX_CHECKED; i++) {
+    set_add(set, i * i);
+    vec_push(entries_vec, i * i);
+  }
+
+  assert_int(set_cap(set), >=, MAX_CHECKED);
+  assert_int(set_size(set), ==, MAX_CHECKED);
+
+  assert_false(set_has(set, -1));
+  for (int i = 0; i < MAX_CHECKED; i++) {
+    assert_true(set_has(set, i * i));
+    assert_int(set_get(set, i * i), ==, i * i);
+  }
+  assert_false(set_has(set, MAX_CHECKED * MAX_CHECKED));
+
+  set_foreach(int x, set) {
+    int *res = vec_bsearch(entries_vec, &x, int_compare);
+    assert_ptr_not_null(res);
+    assert_int(*res, ==, x);
+  }
+
+  /* Nested foreach */ {
+    set_foreach(int x, set) {
+      bool found = false;
+      set_foreach(int y, set) {
+        if (y == x) found = true;
+      }
+      assert_true(found);
+    }
+  }
+
+  set_free(set);
+
+  return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
   {"/add_remove", test_add_remove, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/foreach", test_foreach, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
 const MunitSuite set_test_suite = {

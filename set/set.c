@@ -64,7 +64,7 @@ static inline void ft_set_tombstone(
 // Calculates the size of the memory block of a set of bucket_count entries
 static inline size_t calculate_mem_len(size_t bucket_count, size_t val_len) {
   return calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_set_header_t)
-       + (val_len + 1) * bucket_count;
+       + val_len * (bucket_count + 1);
 }
 
 // Compute the set header from a pointer to the sets first value.
@@ -260,7 +260,14 @@ bool __ds_set_remove_internal(void *set, void *key, size_t val_len) {
   return true;
 }
 
+bool __ds_set_is_index_filled(void *set, uint32_t index) {
+  __ds_set_header_t *header = header_from_set(set);
+  uint8_t *ft_bitmap = ft_bitmap_from_header(header);
+  return ft_is_full(ft_bitmap, index);
+}
+
 /* EXTERNAL */
+const uint32_t __ds_set_null_index = UINT32_MAX;
 
 uint32_t ds_set_cap(void *set) { return header_from_set(set)->cap; }
 

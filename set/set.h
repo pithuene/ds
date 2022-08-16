@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <limits.h>
 
+#include "../util/unique_symbol.h"
+
 #ifndef DS_NO_SHORT_NAMES
 #define set_t              ds_set_t
 #define set_create         ds_set_create
@@ -19,6 +21,7 @@
 #define set_free           ds_set_free
 #define set_hash_default   ds_set_hash_default
 #define set_equals_default ds_set_equals_default
+#define set_foreach        ds_set_foreach
 #endif /* DS_NO_SHORT_NAMES */
 
 typedef uint64_t(ds_set_hash_func_t)(void *key, size_t key_len);
@@ -50,8 +53,10 @@ void *__ds_set_reserve_internal(void *old_set, size_t new_cap, size_t val_len);
 uint32_t __ds_set_alloc_bucket(void *set, void *key, size_t val_len);
 uint32_t __ds_set_get_internal(void *set, void *key, size_t val_len);
 bool __ds_set_remove_internal(void *set, void *key, size_t val_len);
+// Checks whether a given bucket index is filled
+bool __ds_set_is_index_filled(void *set, uint32_t index);
 
-const uint32_t __ds_set_null_index = UINT32_MAX;
+extern const uint32_t __ds_set_null_index;
 
 /* EXTERNAL */
 
@@ -65,8 +70,8 @@ void ds_set_free(void *set);
 #define ds_set_reserve(SET, NEWCAP) \
   ((SET) = __ds_set_reserve_internal(SET, NEWCAP, sizeof(*SET)))
 #define ds_set_add(SET, ...)                                          \
-  ((SET)[0] = (__VA_ARGS__),                                          \
-   ds_set_reserve(SET, ds_set_size(SET) + 1),                         \
+  (ds_set_reserve(SET, ds_set_size(SET) + 1),                         \
+   (SET)[0] = (__VA_ARGS__),                                          \
    (SET)[__ds_set_alloc_bucket(SET, &(SET)[0], sizeof(*(SET))) + 1] = \
      (SET)[0])
 #define ds_set_has(SET, ...) \
@@ -78,5 +83,20 @@ void ds_set_free(void *set);
 #define ds_set_remove(SET, ...) \
   ((SET)[0] = (__VA_ARGS__),    \
    __ds_set_remove_internal(SET, &(SET)[0], sizeof(*SET)))
+
+// Usage:
+// set_t(int) my_set = ...
+// set_foreach(int x, my_set) {
+//   printf("%d\n", x);
+// }
+#define ds_set_foreach(DEF, SET)                                    \
+  for (int ds_unique_symbol(index) = 0;                             \
+       ds_unique_symbol(index) < ds_set_cap(SET);                   \
+       ds_unique_symbol(index)++)                                   \
+    for (DEF = (SET)[ds_unique_symbol(index) + 1],                  \
+        *ds_unique_symbol(ran) = (void *) 0;                        \
+         !ds_unique_symbol(ran)                                     \
+         && __ds_set_is_index_filled(SET, ds_unique_symbol(index)); \
+         ds_unique_symbol(ran) = (void *) 1)
 
 #endif /* DS_SET_H */

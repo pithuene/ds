@@ -306,6 +306,8 @@ bool __ds_map_remove_internal(void *map, void *key, size_t val_len) {
 
 /* EXTERNAL */
 
+const uint32_t __ds_map_null_index = UINT32_MAX;
+
 uint32_t ds_map_cap(void *map) { return header_from_map(map)->cap; }
 
 uint32_t ds_map_size(void *map) { return header_from_map(map)->size; }
