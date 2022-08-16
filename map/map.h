@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <limits.h>
 
+#include "../util/unique_symbol.h"
+
 #ifndef DS_NO_SHORT_NAMES
 #define map_t              ds_map_t
 #define map_create         ds_map_create
@@ -19,6 +21,7 @@
 #define map_free           ds_map_free
 #define map_hash_default   ds_map_hash_default
 #define map_equals_default ds_map_equals_default
+#define map_foreach        ds_map_foreach
 #endif /* DS_NO_SHORT_NAMES */
 
 typedef uint64_t(ds_map_hash_func_t)(void *key, size_t key_len);
@@ -53,6 +56,8 @@ void *__ds_map_reserve_internal(void *old_map, size_t new_cap, size_t val_len);
 uint32_t __ds_map_alloc_bucket(void *map, void *key, size_t val_len);
 uint32_t __ds_map_get_internal(void *map, void *key, size_t val_len);
 bool __ds_map_remove_internal(void *map, void *key, size_t val_len);
+void *__ds_map_get_key(void *map, uint32_t bucket_index);
+bool __ds_map_is_index_filled(void *map, uint32_t index);
 
 extern const uint32_t __ds_map_null_index;
 
@@ -80,5 +85,24 @@ void ds_map_free(void *map);
   ((MAP)[__ds_map_get_internal(MAP, KEY, sizeof(*MAP))])
 #define ds_map_remove(MAP, KEY) \
   (__ds_map_remove_internal(MAP, KEY, sizeof(*MAP)))
+
+// Usage:
+// map_t(int, int) my_map = ...
+// map_foreach(int *key, int value, my_map) {
+//   printf("Mapping %d to %d\n", *key, value);
+// }
+#define ds_map_foreach(KEY_DEF, VAL_DEF, MAP)                       \
+  for (int ds_unique_symbol(index) = 0;                             \
+       ds_unique_symbol(index) < ds_map_cap(MAP);                   \
+       ds_unique_symbol(index)++)                                   \
+    for (KEY_DEF = __ds_map_get_key(MAP, ds_unique_symbol(index)),  \
+        *ds_unique_symbol(key_ran) = (void *) 0;                    \
+         !ds_unique_symbol(key_ran)                                 \
+         && __ds_map_is_index_filled(MAP, ds_unique_symbol(index)); \
+         ds_unique_symbol(key_ran) = (void *) 1)                    \
+      for (VAL_DEF = (MAP)[ds_unique_symbol(index)],                \
+          *ds_unique_symbol(val_ran) = (void *) 0;                  \
+           !ds_unique_symbol(val_ran);                              \
+           ds_unique_symbol(val_ran) = (void *) 1)
 
 #endif /* DS_MAP_H */

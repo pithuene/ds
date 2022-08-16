@@ -160,6 +160,29 @@ static MunitResult test_small_map(
   return MUNIT_OK;
 }
 
+static MunitResult test_foreach(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+  map_t(int, int) map = map_create(
+    int,
+    int,
+    8,
+    (ds_map_hash_func_t *) inthash,
+    (ds_map_equals_func_t *) intequals
+  );
+
+  for (int i = 0; i < 100; i++) {
+    map_put(map, &i, i * i);
+  }
+
+  map_foreach(int *key, int value, map) {
+    assert_int((*key) * (*key), ==, value);
+  }
+
+  map_free(map);
+  return MUNIT_OK;
+}
+
 static MunitTest tests[] = {
   {"/ft_bitmap_size",
    test_ft_bitmap_size,
@@ -171,6 +194,7 @@ static MunitTest tests[] = {
   {"/next_pow_2", test_next_pow_2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/map", test_map, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/small_map", test_small_map, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
+  {"/foreach", test_foreach, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
 const MunitSuite map_test_suite = {

@@ -304,6 +304,19 @@ bool __ds_map_remove_internal(void *map, void *key, size_t val_len) {
   return true;
 }
 
+// Get a pointer to the key of some bucket
+void *__ds_map_get_key(void *map, uint32_t bucket_index) {
+  __ds_map_header_t *header = header_from_map(map);
+  void *keys = keys_from_header(header);
+  return get_key(keys, header->key_len, bucket_index);
+}
+
+bool __ds_map_is_index_filled(void *map, uint32_t index) {
+  __ds_map_header_t *header = header_from_map(map);
+  uint8_t *ft_bitmap = ft_bitmap_from_header(header);
+  return ft_is_full(ft_bitmap, index);
+}
+
 /* EXTERNAL */
 
 const uint32_t __ds_map_null_index = UINT32_MAX;
