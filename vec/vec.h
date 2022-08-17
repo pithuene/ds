@@ -27,15 +27,9 @@
 
 /* INTERNAL */
 
-// TODO: If you add a function ds_vec_increment_size (probably better to add
-// ds_vec_resize and use that) the header definition can become internal
 typedef struct {
   uint64_t len : 32;
   uint64_t cap : 32;
-} __ds_vec_header_t;
-
-typedef struct {
-  __ds_vec_header_t header;
   // Actually a T[], used only for offset calculations
   uint8_t items[];
 } __ds_vec_struct_t;
@@ -46,11 +40,9 @@ size_t __ds_vec_capacity_after_push(void *vec);
 
 /* EXTERNAL */
 
-#define ds_vec_len(VEC) \
-  (ds_container_of(VEC, __ds_vec_struct_t, items)->header.len)
+#define ds_vec_len(VEC) (ds_container_of(VEC, __ds_vec_struct_t, items)->len)
 
-#define ds_vec_cap(VEC) \
-  (ds_container_of(VEC, __ds_vec_struct_t, items)->header.cap)
+#define ds_vec_cap(VEC) (ds_container_of(VEC, __ds_vec_struct_t, items)->cap)
 
 #define ds_vec_t(TYPE) TYPE *
 
