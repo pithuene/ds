@@ -2,6 +2,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "../util/container_of.h"
+
 /* NOT EXPOSED */
 
 // Check if v is a power of two
@@ -89,7 +91,7 @@ static inline size_t calculate_mem_len(
   size_t bucket_count, size_t key_len, size_t val_len
 ) {
   return calculate_keys_mem_len(key_len, bucket_count)
-       + calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_map_header_t)
+       + calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_map_struct_t)
        + val_len * bucket_count;
 }
 
@@ -99,22 +101,17 @@ static inline void *map_from_keys(
 ) {
   const size_t offset = calculate_keys_mem_len(key_len, bucket_count)
                       + calculate_ft_bitmap_size(bucket_count)
-                      + sizeof(__ds_map_header_t);
+                      + sizeof(__ds_map_struct_t);
   return ((char *) keys) + offset;
 }
 
 // Compute the map header from a pointer to the maps first value.
-static inline __ds_map_header_t *header_from_map(void *map) {
-  return (__ds_map_header_t *) (((char *) map) - sizeof(__ds_map_header_t));
-}
-
-// Compute the map header from a pointer to the maps first value.
-static inline uint8_t *ft_bitmap_from_header(__ds_map_header_t *header) {
+static inline uint8_t *ft_bitmap_from_header(__ds_map_struct_t *header) {
   return (uint8_t
             *) (((char *) header) - calculate_ft_bitmap_size(header->cap));
 }
 
-static inline void *keys_from_header(__ds_map_header_t *header) {
+static inline void *keys_from_header(__ds_map_struct_t *header) {
   const size_t offset = calculate_keys_mem_len(header->key_len, header->cap)
                       + calculate_ft_bitmap_size(header->cap);
   return ((char *) header) - offset;
@@ -183,8 +180,8 @@ void *__ds_map_create_internal(
   void *keys = calloc(1, mem_len);
   void *map = map_from_keys(keys, key_len, bucket_count);
 
-  __ds_map_header_t *header = header_from_map(map);
-  *header = (__ds_map_header_t){
+  __ds_map_struct_t *header = ds_container_of(map, __ds_map_struct_t, buckets);
+  *header = (__ds_map_struct_t){
     .size = 0,
     .cap = bucket_count,
     .tombstone_count = 0,
@@ -202,7 +199,7 @@ void *__ds_map_create_internal(
  * Also sets the bitmap entries and copies stores the key.
  * Returns the index of the bucket.*/
 uint32_t __ds_map_alloc_bucket(void *map, void *key, size_t val_len) {
-  __ds_map_header_t *header = header_from_map(map);
+  __ds_map_struct_t *header = ds_container_of(map, __ds_map_struct_t, buckets);
   void *keys = keys_from_header(header);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
@@ -239,14 +236,16 @@ uint32_t __ds_map_alloc_bucket(void *map, void *key, size_t val_len) {
 void *__ds_map_reserve_internal(
   void *old_map, size_t new_entry_count, size_t val_len
 ) {
-  __ds_map_header_t *old_header = header_from_map(old_map);
+  __ds_map_struct_t *old_header =
+    ds_container_of(old_map, __ds_map_struct_t, buckets);
   const size_t new_cap = capacity_for_entry_count(new_entry_count);
   if (old_header->cap >= new_cap) return old_map;
   void *new_keys =
     calloc(1, calculate_mem_len(new_cap, old_header->key_len, val_len));
   void *new_map = map_from_keys(new_keys, old_header->key_len, new_cap);
-  __ds_map_header_t *new_header = header_from_map(new_map);
-  *new_header = (__ds_map_header_t){
+  __ds_map_struct_t *new_header =
+    ds_container_of(new_map, __ds_map_struct_t, buckets);
+  *new_header = (__ds_map_struct_t){
     .cap = new_cap,
     .size = 0,
     .tombstone_count = 0,
@@ -277,7 +276,7 @@ void *__ds_map_reserve_internal(
 }
 
 uint32_t __ds_map_get_internal(void *map, void *key, size_t val_len) {
-  __ds_map_header_t *header = header_from_map(map);
+  __ds_map_struct_t *header = ds_container_of(map, __ds_map_struct_t, buckets);
   void *keys = keys_from_header(header);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
@@ -308,7 +307,7 @@ bool __ds_map_remove_internal(void *map, void *key, size_t val_len) {
   uint32_t bucket_index = __ds_map_get_internal(map, key, val_len);
   if (bucket_index == __ds_map_null_index) return false;
 
-  __ds_map_header_t *header = header_from_map(map);
+  __ds_map_struct_t *header = ds_container_of(map, __ds_map_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
   ft_set_tombstone(ft_bitmap, bucket_index, true);
   return true;
@@ -316,13 +315,13 @@ bool __ds_map_remove_internal(void *map, void *key, size_t val_len) {
 
 // Get a pointer to the key of some bucket
 void *__ds_map_get_key(void *map, uint32_t bucket_index) {
-  __ds_map_header_t *header = header_from_map(map);
+  __ds_map_struct_t *header = ds_container_of(map, __ds_map_struct_t, buckets);
   void *keys = keys_from_header(header);
   return get_key(keys, header->key_len, bucket_index);
 }
 
 bool __ds_map_is_index_filled(void *map, uint32_t index) {
-  __ds_map_header_t *header = header_from_map(map);
+  __ds_map_struct_t *header = ds_container_of(map, __ds_map_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
   return ft_is_full(ft_bitmap, index);
 }
@@ -331,12 +330,16 @@ bool __ds_map_is_index_filled(void *map, uint32_t index) {
 
 const uint32_t __ds_map_null_index = UINT32_MAX;
 
-uint32_t ds_map_cap(void *map) { return header_from_map(map)->cap; }
+uint32_t ds_map_cap(void *map) {
+  return ds_container_of(map, __ds_map_struct_t, buckets)->cap;
+}
 
-uint32_t ds_map_size(void *map) { return header_from_map(map)->size; }
+uint32_t ds_map_size(void *map) {
+  return ds_container_of(map, __ds_map_struct_t, buckets)->size;
+}
 
 void ds_map_free(void *map) {
-  __ds_map_header_t *header = header_from_map(map);
+  __ds_map_struct_t *header = ds_container_of(map, __ds_map_struct_t, buckets);
   void *keys = keys_from_header(header);
   free(keys);
 }

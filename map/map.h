@@ -42,7 +42,9 @@ typedef struct {
   ds_map_hash_func_t *hash_func;
   /* Function with which map keys are compared */
   ds_map_equals_func_t *equals_func;
-} __ds_map_header_t;
+  /* T[] placeholder for offset calculations */
+  uint64_t buckets[];
+} __ds_map_struct_t;
 
 void *__ds_map_create_internal(
   size_t key_len,
