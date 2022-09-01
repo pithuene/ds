@@ -1,8 +1,9 @@
 #include "set.h"
 #include <assert.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+#include <stdbool.h>
+
+#include "../util/container_of.h"
 
 /* NOT EXPOSED */
 
@@ -74,13 +75,8 @@ static inline void ft_set_tombstone(
 
 // Calculates the size of the memory block of a set of bucket_count entries
 static inline size_t calculate_mem_len(size_t bucket_count, size_t val_len) {
-  return calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_set_header_t)
+  return calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_set_struct_t)
        + val_len * (bucket_count + 1);
-}
-
-// Compute the set header from a pointer to the sets first value.
-static inline __ds_set_header_t *header_from_set(void *set) {
-  return (__ds_set_header_t *) (((char *) set) - sizeof(__ds_set_header_t));
 }
 
 // Add the size of the ft_bitmap and the set header to the pointer
@@ -88,10 +84,10 @@ static inline void *set_from_ft_bitmap(
   uint8_t *ft_bitmap, size_t bucket_count
 ) {
   return (void
-            *) (((char *) ft_bitmap) + calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_set_header_t));
+            *) (((char *) ft_bitmap) + calculate_ft_bitmap_size(bucket_count) + sizeof(__ds_set_struct_t));
 }
 
-static inline uint8_t *ft_bitmap_from_header(__ds_set_header_t *header) {
+static inline uint8_t *ft_bitmap_from_header(__ds_set_struct_t *header) {
   return (uint8_t
             *) (((char *) header) - calculate_ft_bitmap_size(header->cap));
 }
@@ -154,8 +150,8 @@ void *__ds_set_create_internal(
   uint8_t *ft_bitmap = calloc(1, mem_len);
   void *set = set_from_ft_bitmap(ft_bitmap, bucket_count);
 
-  __ds_set_header_t *header = header_from_set(set);
-  *header = (__ds_set_header_t){
+  __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
+  *header = (__ds_set_struct_t){
     .size = 0,
     .cap = bucket_count,
     .tombstone_count = 0,
@@ -172,7 +168,7 @@ void *__ds_set_create_internal(
  * Also sets the bitmap entries and copies stores the key.
  * Returns the index of the bucket.*/
 uint32_t __ds_set_alloc_bucket(void *set, void *key, size_t val_len) {
-  __ds_set_header_t *header = header_from_set(set);
+  __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
   uint32_t bucket_index = (*header->hash_func)(key, val_len) % header->cap;
@@ -202,13 +198,15 @@ uint32_t __ds_set_alloc_bucket(void *set, void *key, size_t val_len) {
 void *__ds_set_reserve_internal(
   void *old_set, size_t new_entry_count, size_t val_len
 ) {
-  __ds_set_header_t *old_header = header_from_set(old_set);
+  __ds_set_struct_t *old_header =
+    ds_container_of(old_set, __ds_set_struct_t, buckets);
   const size_t new_cap = capacity_for_entry_count(new_entry_count);
   if (old_header->cap >= new_cap) return old_set;
   uint8_t *new_ft_bitmap = calloc(1, calculate_mem_len(new_cap, val_len));
   void *new_set = set_from_ft_bitmap(new_ft_bitmap, new_cap);
-  __ds_set_header_t *new_header = header_from_set(new_set);
-  *new_header = (__ds_set_header_t){
+  __ds_set_struct_t *new_header =
+    ds_container_of(new_set, __ds_set_struct_t, buckets);
+  *new_header = (__ds_set_struct_t){
     .cap = new_cap,
     .size = 0,
     .tombstone_count = 0,
@@ -235,7 +233,7 @@ void *__ds_set_reserve_internal(
 }
 
 uint32_t __ds_set_get_internal(void *set, void *key, size_t val_len) {
-  __ds_set_header_t *header = header_from_set(set);
+  __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
   uint32_t bucket_index = (*header->hash_func)(key, val_len) % header->cap;
@@ -265,14 +263,14 @@ bool __ds_set_remove_internal(void *set, void *key, size_t val_len) {
   uint32_t bucket_index = __ds_set_get_internal(set, key, val_len);
   if (bucket_index == __ds_set_null_index) return false;
 
-  __ds_set_header_t *header = header_from_set(set);
+  __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
   ft_set_tombstone(ft_bitmap, bucket_index, true);
   return true;
 }
 
 bool __ds_set_is_index_filled(void *set, uint32_t index) {
-  __ds_set_header_t *header = header_from_set(set);
+  __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
   return ft_is_full(ft_bitmap, index);
 }
@@ -280,11 +278,15 @@ bool __ds_set_is_index_filled(void *set, uint32_t index) {
 /* EXTERNAL */
 const uint32_t __ds_set_null_index = UINT32_MAX;
 
-uint32_t ds_set_cap(void *set) { return header_from_set(set)->cap; }
+uint32_t ds_set_cap(void *set) {
+  return ds_container_of(set, __ds_set_struct_t, buckets)->cap;
+}
 
-uint32_t ds_set_size(void *set) { return header_from_set(set)->size; }
+uint32_t ds_set_size(void *set) {
+  return ds_container_of(set, __ds_set_struct_t, buckets)->size;
+}
 
 void ds_set_free(void *set) {
-  __ds_set_header_t *header = header_from_set(set);
+  __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
   free(ft_bitmap_from_header(header));
 }

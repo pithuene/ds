@@ -31,7 +31,7 @@ typedef struct {
   uint64_t len : 32;
   uint64_t cap : 32;
   // Actually a T[], used only for offset calculations
-  uint8_t items[];
+  uint64_t items[];
 } __ds_vec_struct_t;
 
 void *__ds_vec_create(size_t val_len, size_t cap);

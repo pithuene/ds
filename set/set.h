@@ -40,7 +40,9 @@ typedef struct {
   ds_set_hash_func_t *hash_func;
   /* Function with which set keys are compared */
   ds_set_equals_func_t *equals_func;
-} __ds_set_header_t;
+  /* T[] placeholder for offset calculations */
+  uint64_t buckets[];
+} __ds_set_struct_t;
 
 void *__ds_set_create_internal(
   size_t val_len,
