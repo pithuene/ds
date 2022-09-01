@@ -6,6 +6,17 @@
 
 /* NOT EXPOSED */
 
+// Check if v is a power of two
+// https://graphics.stanford.edu/~seander/bithacks.html#DetermineIfPowerOf2
+static inline bool is_pow2(uint32_t v) { return v && !(v & (v - 1)); }
+
+// Calculate x mod y where y = 2^p for some p
+// https://graphics.stanford.edu/~seander/bithacks.html#ModulusDivisionEasy
+static inline uint32_t mod_pow2(uint32_t x, uint32_t y) {
+  assert(is_pow2(y));
+  return (x & (y - 1));
+}
+
 // Calculate the byte size of the filled / tombstone bitmap
 // The size is rounded up to a multiple of 8 bytes to avoid alignment issues.
 static inline size_t calculate_ft_bitmap_size(size_t bucket_count) {
@@ -170,7 +181,7 @@ uint32_t __ds_set_alloc_bucket(void *set, void *key, size_t val_len) {
          )(get_value(set, val_len, bucket_index), key, val_len)) {
     // Linear probing
     bucket_index++;
-    bucket_index %= header->cap;
+    bucket_index = mod_pow2(bucket_index, header->cap);
   }
 
   // Adjust map metadata
@@ -234,7 +245,7 @@ uint32_t __ds_set_get_internal(void *set, void *key, size_t val_len) {
   ) {
     // Linear probing
     bucket_index++;
-    bucket_index %= header->cap;
+    bucket_index = mod_pow2(bucket_index, header->cap);
   }
 
   // At this point, either a full bucket is reached, in which case it contains

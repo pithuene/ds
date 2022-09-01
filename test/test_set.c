@@ -23,6 +23,19 @@ bool struct_compare_function(void *key1, void *key2, size_t size) {
   return ((Struct *) key1)->key == ((Struct *) key2)->key;
 }
 
+static MunitResult test_mod_pow2(
+  const MunitParameter params[], void *user_data_or_fixture
+) {
+  for (uint32_t p = 0; p < 10; p++) {
+    uint32_t two_to_the_p = 1 << p;
+    if (p == 3) assert_uint32(two_to_the_p, ==, 8);
+    for (uint32_t x = 0; x < 1000000; x += 1333) {
+      assert_uint32(mod_pow2(x, two_to_the_p), ==, x % two_to_the_p);
+    }
+  }
+  return MUNIT_OK;
+}
+
 static MunitResult test_add_remove(
   const MunitParameter params[], void *user_data_or_fixture
 ) {
@@ -98,6 +111,7 @@ static MunitResult test_foreach(
 }
 
 static MunitTest tests[] = {
+  {"/mod_pow2", test_mod_pow2, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/add_remove", test_add_remove, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {"/foreach", test_foreach, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL},
   {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
