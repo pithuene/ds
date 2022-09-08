@@ -1,6 +1,6 @@
 CFLAGS_DEBUG = -g -fprofile-arcs -ftest-coverage
 CFLAGS_RELEASE = -O3 -DNDEBUG
-CFLAGS = -std=c99 -pedantic -Wall -Wno-override-init-side-effects -Wno-unused-function -Werror
+CFLAGS = -std=c99 -pedantic -Wall -Wno-override-init -Wno-unused-function -Werror
 
 IMPL_HEADERS = ./arr/arr.h ./vec/vec.h ./heap/heap.h ./mem/pool/pool.h ./map/map.h ./set/set.h ./llist/llist.h
 IMPL_SRCS = ./vec/vec.c ./heap/heap.c ./mem/pool/pool.c ./map/map.c ./set/set.c  ./llist/llist.c
@@ -19,7 +19,7 @@ $(TEST_OBJS): test/%.o: test/%.c
 	$(CC) $(CFLAGS) $(CFLAGS_DEBUG) -c -o $@ $<
 
 test/test: $(TEST_SRCS) $(IMPL_SRCS) $(IMPL_HEADERS) clean-coverage
-	$(CC) $(CFLAGS) $(CFLAGS_DEBUG) -o test/test test/test.c $(TEST_SRCS) test/munit/munit.c -lm
+	$(CC) $(CFLAGS) $(CFLAGS_DEBUG) -Wno-c11-extensions -o test/test test/test.c $(TEST_SRCS) test/munit/munit.c -lm
 
 .PHONY: test
 test: test/test
