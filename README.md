@@ -8,6 +8,7 @@ Datastructures
 
 - `arr_t(T)` — A static array with runtime known length
 - [`vec_t(T)`](./vec/README.md) — A dynamic array
+- `heap_t(T)`(./heap/heap.h) — A priority queue
 - [`set_t(T)`](./set/README.md) — A hash set
 - [`map_t(K, V)`](./map/README.md) — A hash map with typesafe values
 - [`pool_allocator_t(T)`](./mem/pool/README.md) — A generic memory pool
