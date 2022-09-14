@@ -85,10 +85,6 @@ void __ds_heap_heapify_up(
 void __ds_heap_heapify_down(void *heap_vector, size_t val_len) {
   __ds_heap_struct_t *heap =
     ds_container_of(heap_vector, __ds_heap_struct_t, vector);
-  if (ds_vec_len(heap->vector) <= 1) {
-    return;
-  }
-
   int32_t curr = 0;
   while (true) {
     int32_t left_child = left_child_index(curr, heap->vector);
