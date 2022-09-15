@@ -32,7 +32,7 @@ void *__ds_vec_reserve_internal(
     // Capacity sufficient
     return &vec->items;
   }
-  vec = (__ds_vec_struct_t *) realloc(vec, vec_memory_length(new_cap, val_len));
+  vec = realloc(vec, vec_memory_length(new_cap, val_len));
   vec->cap = new_cap;
   return &vec->items;
 }
