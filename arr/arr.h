@@ -25,11 +25,11 @@ struct __ds_arr_struct_t {
 #define ds_arr_t(TYPE) TYPE *
 
 #define ds_arr_create(TYPE, LENGTH, ...) \
-  ((TYPE *) &(struct {                   \
-     uint64_t len;                       \
-     TYPE values[LENGTH];                \
-   }){LENGTH, __VA_ARGS__}               \
-     .values)
+  (&(struct {                            \
+      uint64_t len;                      \
+      TYPE values[LENGTH];               \
+    }){LENGTH, __VA_ARGS__}              \
+      .values[0])
 
 #define ds_arr_len(ARR) \
   (ds_container_of(ARR, struct __ds_arr_struct_t, values)->len)
