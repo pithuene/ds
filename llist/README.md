@@ -26,6 +26,12 @@ Get the first element of the list
 llist_item_t(int) item = llist_first(list);
 ```
 
+Get the value of a list item
+``` c
+llist_item_t(int) item = ...;
+int value = *item;
+```
+
 Get the last element of the list
 ``` c
 llist_item_t(int) item = llist_last(list);
