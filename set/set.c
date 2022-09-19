@@ -269,6 +269,7 @@ bool __ds_set_remove_internal(void *set, void *key, size_t val_len) {
   __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
   ft_set_tombstone(ft_bitmap, bucket_index, true);
+  header->tombstone_count++;
   return true;
 }
 
@@ -279,7 +280,7 @@ bool __ds_set_is_index_filled(void *set, uint32_t index) {
 }
 
 /* EXTERNAL */
-const uint32_t __ds_set_null_index = UINT32_MAX;
+const uint32_t __ds_set_null_index = UINT32_MAX - 1;
 
 uint32_t ds_set_cap(void *set) {
   return ds_container_of(set, __ds_set_struct_t, buckets)->cap;

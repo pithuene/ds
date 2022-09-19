@@ -50,6 +50,14 @@ static MunitResult test_add_remove(
   set_remove(set, new_element);
   assert(!set_has(set, new_element));
 
+  // Make sure getting a non existent entry crashes.
+  // There used to be an issue, where the increment used to skip the temp slot
+  // resulted in an overflow of the invalid index value, which made this return
+  // the temp slot value instead of crash.
+  assert_uint32(
+    __ds_set_get_internal(set, &(set)[0], sizeof(*set)) + 1, >, 100000
+  );
+
   for (int i = 0; i < 10; i++) {
     new_element.key = i + 10;
     set_add(set, new_element);
