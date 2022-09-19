@@ -156,8 +156,8 @@ void *__ds_set_create_internal(
     .size = 0,
     .cap = bucket_count,
     .tombstone_count = 0,
-    .hash_func = (hash_func) ? hash_func : ds_set_hash_default,
-    .equals_func = (equals_func) ? equals_func : ds_set_equals_default,
+    .hash_func = hash_func ? hash_func : ds_set_hash_default,
+    .equals_func = equals_func ? equals_func : ds_set_equals_default,
   };
 
   return set;
@@ -172,7 +172,8 @@ uint32_t __ds_set_alloc_bucket(void *set, void *key, size_t val_len) {
   __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
-  uint32_t bucket_index = (*header->hash_func)(key, val_len) % header->cap;
+  uint32_t bucket_index =
+    mod_pow2((*header->hash_func)(key, val_len), header->cap);
   while (ft_is_full(ft_bitmap, bucket_index)
          && !(*header->equals_func
          )(get_value(set, val_len, bucket_index), key, val_len)) {
@@ -237,7 +238,8 @@ uint32_t __ds_set_get_internal(void *set, void *key, size_t val_len) {
   __ds_set_struct_t *header = ds_container_of(set, __ds_set_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
-  uint32_t bucket_index = (*header->hash_func)(key, val_len) % header->cap;
+  uint32_t bucket_index =
+    mod_pow2((*header->hash_func)(key, val_len), header->cap);
   while (
     ft_has_tombstone(ft_bitmap, bucket_index)
     || (ft_is_full(ft_bitmap, bucket_index) && !(*header->equals_func)(get_value(set, val_len, bucket_index), key, val_len))

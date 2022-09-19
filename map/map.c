@@ -205,7 +205,7 @@ uint32_t __ds_map_alloc_bucket(void *map, void *key, size_t val_len) {
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
   uint32_t bucket_index =
-    (*header->hash_func)(key, header->key_len) % header->cap;
+    mod_pow2((*header->hash_func)(key, header->key_len), header->cap);
   while (ft_is_full(ft_bitmap, bucket_index)
          && !(*header->equals_func
          )(get_key(keys, header->key_len, bucket_index), key, header->key_len)
@@ -282,7 +282,7 @@ uint32_t __ds_map_get_internal(void *map, void *key, size_t val_len) {
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
   uint32_t bucket_index =
-    (*header->hash_func)(key, header->key_len) % header->cap;
+    mod_pow2((*header->hash_func)(key, header->key_len), header->cap);
   while (ft_has_tombstone(ft_bitmap, bucket_index)
     || (ft_is_full(ft_bitmap, bucket_index) && !(*header->equals_func)(get_key(keys, header->key_len, bucket_index), key, header->key_len)
   )) {
