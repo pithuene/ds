@@ -94,12 +94,20 @@ void __ds_llist_append_after(
 
 void __ds_llist_first(void *list_t_ptr) {
   llist_struct_t *llist = ds_container_of(list_t_ptr, llist_struct_t, t_ptr);
-  llist->t_ptr = &(llist->first->value);
+  if (llist->first == NULL) {
+    llist->t_ptr = NULL;
+  } else {
+    llist->t_ptr = &(llist->first->value);
+  }
 }
 
 void __ds_llist_last(void *list_t_ptr) {
   llist_struct_t *llist = ds_container_of(list_t_ptr, llist_struct_t, t_ptr);
-  llist->t_ptr = &(llist->last->value);
+  if (llist->last == NULL) {
+    llist->t_ptr = NULL;
+  } else {
+    llist->t_ptr = &(llist->last->value);
+  }
 }
 
 void *__ds_llist_next(void *item_value) {

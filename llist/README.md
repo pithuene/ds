@@ -1,7 +1,7 @@
 Linked List
 ===========
 
-A generic linked list.
+A generic singly linked list.
 
 Usage
 -----

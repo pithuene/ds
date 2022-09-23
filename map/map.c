@@ -187,8 +187,8 @@ void *__ds_map_create_internal(
     .cap = bucket_count,
     .tombstone_count = 0,
     .key_len = key_len,
-    .hash_func = (hash_func) ? hash_func : ds_map_hash_default,
-    .equals_func = (equals_func) ? equals_func : ds_map_equals_default,
+    .hash_func = hash_func ? hash_func : ds_map_hash_default,
+    .equals_func = equals_func ? equals_func : ds_map_equals_default,
   };
 
   return map;
@@ -283,9 +283,10 @@ uint32_t __ds_map_get_internal(void *map, void *key, size_t val_len) {
 
   uint32_t bucket_index =
     mod_pow2((*header->hash_func)(key, header->key_len), header->cap);
-  while (ft_has_tombstone(ft_bitmap, bucket_index)
-    || (ft_is_full(ft_bitmap, bucket_index) && !(*header->equals_func)(get_key(keys, header->key_len, bucket_index), key, header->key_len)
-  )) {
+  while (ft_has_tombstone(ft_bitmap, bucket_index) ||
+         (ft_is_full(ft_bitmap, bucket_index) &&
+          !(*header->equals_func)(get_key(keys, header->key_len, bucket_index),
+                                  key, header->key_len))) {
     // Linear probing
     bucket_index++;
     bucket_index = mod_pow2(bucket_index, header->cap);

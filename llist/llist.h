@@ -55,7 +55,8 @@ void *__ds_llist_next(void *item_value);
 
 // ds_llist_itemref_t ds_llist_last(void *list);
 
-#define ds_llist_next(LIST, ITEM) (*(LIST) = __ds_llist_next(ITEM))
+#define ds_llist_next(LIST, ITEM) \
+  (*(LIST) = ITEM, *(LIST) = __ds_llist_next(ITEM))
 
 // TODO: Is this macro necessary?
 #define ds_llist_create(TYPE) ((ds_llist_t(TYPE)) __ds_llist_create())

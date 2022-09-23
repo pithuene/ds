@@ -1,7 +1,8 @@
 Hash Set
 ========
 
-A generic hash set. The hash set offers constant time lookup, insertion, and removal of items.
+A generic hash set.
+The hash set offers constant time lookup, insertion, and removal of items.
 Capacity is automatically increased as needed.
 Metadata is stored in front of the pointer to the data.
 

@@ -24,7 +24,7 @@ if (vector[0] == 1234) { ... }
 vector[0] = 123;
 ```
 
-However, there are also safe alternative to access the values of a vector.
+However, there are also safe alternatives to access the values of a vector.
 These make use of fact that the length is known at runtime and add assertions to catch out of bounds accesses during debugging.
 ``` c
 if (vec_get(vector, 0) == 1234) { ... }
