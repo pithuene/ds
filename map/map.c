@@ -204,32 +204,36 @@ uint32_t __ds_map_alloc_bucket(void *map, void *key, size_t val_len) {
   void *keys = keys_from_header(header);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
 
+  int64_t tombstone_index = -1;
   uint32_t bucket_index =
     mod_pow2((*header->hash_func)(key, header->key_len), header->cap);
-  while (ft_is_full(ft_bitmap, bucket_index)
-         && !(*header->equals_func
-         )(get_key(keys, header->key_len, bucket_index), key, header->key_len)
-  ) {
+  while (ft_has_tombstone(ft_bitmap, bucket_index) ||
+         (ft_is_full(ft_bitmap, bucket_index) &&
+          !(*header->equals_func)(get_key(keys, header->key_len, bucket_index),
+                                  key, header->key_len))) {
+    if (ft_has_tombstone(ft_bitmap, bucket_index) && tombstone_index < 0) {
+      tombstone_index = bucket_index;
+    }
     // Linear probing
     bucket_index++;
     bucket_index = mod_pow2(bucket_index, header->cap);
   }
 
+  if (!ft_is_full(ft_bitmap, bucket_index)) {
+    // Key is not there
+    if (tombstone_index >= 0) {
+      // Skipped over a tombstone. Reuse its bucket.
+      bucket_index = tombstone_index;
+      header->tombstone_count--;
+      ft_set_tombstone(ft_bitmap, bucket_index, false);
+    }
+    header->size++;
+    ft_set_full(ft_bitmap, bucket_index, true);
+  }
+
   // Save the allocated key
   void *stored_key = get_key(keys, header->key_len, bucket_index);
   memcpy(stored_key, key, header->key_len);
-
-  // Adjust map metadata
-  if (!ft_is_full(ft_bitmap, bucket_index)) {
-    header->size++;
-  }
-  if (ft_has_tombstone(ft_bitmap, bucket_index)) {
-    header->tombstone_count--;
-  }
-
-  // Update filled and tombstone in bitmap
-  ft_set_full(ft_bitmap, bucket_index, true);
-  ft_set_tombstone(ft_bitmap, bucket_index, false);
 
   return bucket_index;
 }
