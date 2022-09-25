@@ -6,9 +6,7 @@
 /* NOT EXPOSED */
 
 static inline size_t vec_memory_length(size_t cap, size_t val_len) {
-  // cap and len are stored in a single uint64_t which requires an
-  // alignment of 8 bytes, making padding unnecessary for any type parameter.
-  return sizeof(uint64_t) + cap * val_len;
+  return sizeof(__ds_vec_struct_t) + cap * val_len;
 }
 
 /* INTERNAL */

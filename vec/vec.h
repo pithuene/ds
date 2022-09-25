@@ -1,10 +1,10 @@
 #ifndef DS_VEC_H
 #define DS_VEC_H
 
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
 #include <assert.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
 
 #include "../util/container_of.h"
 
@@ -16,8 +16,6 @@
 #define vec_reserve ds_vec_reserve
 #define vec_push    ds_vec_push
 #define vec_pop     ds_vec_pop
-#define vec_rm_swap ds_vec_rm_swap
-#define vec_rm      ds_vec_rm
 #define vec_free    ds_vec_free
 #define vec_get     ds_vec_get
 #define vec_set     ds_vec_set
@@ -28,8 +26,8 @@
 /* INTERNAL */
 
 typedef struct {
-  uint64_t len : 32;
-  uint64_t cap : 32;
+  uint64_t len;
+  uint64_t cap;
   // Actually a T[], used only for offset calculations
   uint64_t items[];
 } __ds_vec_struct_t;
