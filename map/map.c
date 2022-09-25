@@ -316,6 +316,7 @@ bool __ds_map_remove_internal(void *map, void *key, size_t val_len) {
   __ds_map_struct_t *header = ds_container_of(map, __ds_map_struct_t, buckets);
   uint8_t *ft_bitmap = ft_bitmap_from_header(header);
   ft_set_tombstone(ft_bitmap, bucket_index, true);
+  header->tombstone_count++;
   return true;
 }
 
